@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Configuration;
+using System.Runtime.CompilerServices;
 
-namespace Recipes.Common
+[assembly: InternalsVisibleTo("Recipes.Common.DotNetFramework.Tests")]
+
+namespace Recipes.Common.DotNetFramework
 {
     // TODO: add description
+    // It does not work in .net core
     internal class MySection : ConfigurationSection
     {
         private MySection() { }
@@ -13,8 +17,8 @@ namespace Recipes.Common
 
 
         [ConfigurationProperty("items")]
-        [ConfigurationCollection(typeof(Items), AddItemName = "worker")]
-        public Items Workers => this["items"] as Items;
+        [ConfigurationCollection(typeof(Items), AddItemName = "item")]
+        public Items Items => this["items"] as Items;
     }
 
 
@@ -77,7 +81,7 @@ namespace Recipes.Common
 
 
         [ConfigurationProperty("secondproperty", IsRequired = true)]
-        public int SecondProperty => Int32.Parse(this["secondproperty"].ToString());
+        public string SecondProperty => this["secondproperty"].ToString();
     }
 
 
