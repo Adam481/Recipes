@@ -10,11 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Scripts.txt = Scripts.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Tests", "src\Recipes.Tests\Recipes.Tests.csproj", "{2BA03403-22A8-4844-AB7F-77B3A5E687DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipes.Tests", "src\Recipes.Tests\Recipes.Tests.csproj", "{2BA03403-22A8-4844-AB7F-77B3A5E687DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Common.DotNetFramework", "src\Recipes.Common.DotNetFramework\Recipes.Common.DotNetFramework.csproj", "{4B533A73-1F05-4E84-9132-E80F52E7D9E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Common.DotNetFramework.Tests", "src\Recipes.Common.DotNetFramework.Tests\Recipes.Common.DotNetFramework.Tests.csproj", "{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Algorithms", "src\Recipes.Algorithms\Recipes.Algorithms.csproj", "{59D2E606-95C7-46BE-B7B6-80529723F0D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
