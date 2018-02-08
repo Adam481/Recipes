@@ -18,6 +18,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Common.DotNetFramew
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Algorithms", "src\Recipes.Algorithms\Recipes.Algorithms.csproj", "{59D2E606-95C7-46BE-B7B6-80529723F0D5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamentals", "{24FBB17F-2055-4096-9BBA-2A5ABEBF5507}"
+	ProjectSection(SolutionItems) = preProject
+		oldnotesCollections.txt = oldnotesCollections.txt
+		oldNotesDelegates.txt = oldNotesDelegates.txt
+		oldnotesGenerics.txt = oldnotesGenerics.txt
+		oldnotesInterfaces.txt = oldnotesInterfaces.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +55,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24FBB17F-2055-4096-9BBA-2A5ABEBF5507} = {D8FF48A6-D68B-4EBC-913B-8A561DDEEEB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EEAC9D1A-5BF1-4CC4-879C-AD7D41CD4253}

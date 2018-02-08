@@ -1,0 +1,1504 @@
+﻿################################################################################
+####																		 ###
+####							Collections									 ###
+####																		 ###
+################################################################################
+
+
+Collections: 
+	using System; 
+Old .Net 1.0 colletion (obsolate)
+	using System.Collections;				<- (obsolate)
+	using System.Collection.Specialized;	<- (obsolate)
+Core generic collections 
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+Concurrent collections (.NET 4.0 and later)
+	using System.Collections.Concurrent;
+Immutable collections (.Net 4.5 only - via NUGET package)
+	using System.Collections.Immutable;
+
+
+
+	
+################################################################################
+
+
+### Array : ICloneable, IList, ICollection, IEnumerable, IStructuralComparable,
+			IStructuralEquatable
+		
+	
+( System.Array )   
+
+Main Point:
+	
+	- Array was created before generic even exists. So it can support above 
+	  interfaces but in not standard way (also implements: IEnumerable<T>, 
+	  ICollection<T>, IList<T>):
+	  * We can work with the array through this interfaces but!
+	  * We can not access the properties and method of this interfaces when we work
+	    with array directly
+
+	- rich API 
+	- very lightweight (best performance when looking at the elements) 
+	- strongly typed   (implemented inside the CLR (not by the generics))
+	- fixed size       (array allocates block of memory)
+	- no ability to add or remove elements
+	- multi-dimensional
+	- accessed using index
+	- elements counter starts from 0
+	
+	- System.IndexOutOfRangeException - when we call index that is out of range
+
+Initialization:
+	
+	string[] collorOptions;   		- array declration 
+	collorOptions = new string[4];  - array initialization
+	string[] collorOptions = new string[4]
+	var collorOptions = new string[4];
+	string[] collorOptions = new string[4] {"Red", "Expresso", "White", "Navy"};
+	string[] collorOptions = {"Red", "Expresso", "White", "Navy"};
+	
+	- Because we have type on the left hand size and el. on the right we can use:
+	
+	string[] collorOptions = { "Red", "Expresso", "White", "Navy" };
+	
+Access;
+	
+	collorOptions[0] = "Red"; 
+	collorOptions[1] = "White";
+
+
+Basic methods:
+
+	Array.IndexOf(collorOptions, "Red");  // find index of el. "Red"  // 0
+	collorOptions.SetValue("Blue", 3);    // set value using method 
+
+	Array.Resize(ref arrayToResize, 10);  // 10 - new size 
+	
+	After executing resize method new array will be created and all value from
+	existing array will be copied to the new one.
+	
+Coping Arrays:
+
+	public void CopyTo(Array array, long index);  // it do not return enything
+
+	Example:
+	
+	int[] tab = {1,2,3,4,5};
+	int[] tableCopy = new int[5];
+	
+	tab.CopyTo(tableCopy, 0);   // start copping from index 0
+	tab == tableCopy;   		// false - arrays refere to different instance
+	
+	Array.Copy(...);			// more elastic copy
+	
+	int[] tableCopy2 = tab.ToArray();	// it also create a new copy of array
+
+Reordering Elements:
+
+	public static void Reverse(Array array);
+	public static void Reverse(Array array, int indexm int lenght);
+	
+	public static void Sort(Array array);
+	public static void Sort<T>(T[] array);
+	
+	var reversed = tab.Reverse().ToArray();   // LINQ extended method
+	
+Sorting Elements:
+		
+	.NET can do comparison for:
+		- string (alphabetically)
+		- int, float, long
+		- other type - base on IComparer<T> implementation
+					   (look at interaces section)
+	
+Finding Elemetns:
+
+	int[] tab = {1,2,3,1,4,5,1};
+	
+	Array.IndexOf();		// search from start and return first element
+	Array.LastIndexOf();    // search from end and return first element (last)
+	Array.FindIndex();		// find first index matching pattern
+	Array.FindLastIndex();  // find last index matching pattern (search from end)
+	Array.FindAll();		// return all element matching pattern
+	
+	int indexOf1 = Array.IndexOf(tab, 1);       // return 0
+	int indexOf1 = Array.LastIndexOf(tab, 1);   // return 6
+	
+	string[] tab = {"MA", "CA", "WA", "MB", "CB"};
+	
+	string indexOfC = Array.FindIndex(tab, x => x[0] == 'C'); // return 1
+	string[] allIndexWithB = Array.FindAll(tab, x => x[1] == 'B'); // return 3,4
+	
+Binary Search:
+
+	If you have sorted array of element you can use much more efficient
+	binary search.
+	
+	int indexOfSTH = Array.BinarySearch(sortedTab, "data");
+	
+LINQ vs Array methods:
+
+	LINQ:
+		- More suited to interfaces (food for best practices)
+		- Consistent for all collections
+		- Return new objects
+	Array members:
+		- performance (no linq overhead!)
+		- only arrays (and List<T>)
+		- modify arrays inline
+
+
+		
+
+################################################################################
+
+
+### Multidimensional Arrays
+
+
+	You can define array that have multiple sites. This is only valid for 
+	array no other colleciton type support it. Especialy usefull if you have 
+	grid of data (like: points etc.) Multidimensional array allocates single
+	block in memory to store its values.
+
+Initialization:
+	
+	double[,] heights = new double[50, 100];	- two dimeensional array.
+	
+	doubcle[,,] heights = new double[2,6,20];   - thre dimensional array
+
+	Commas inform the compiler about number of dimension. In .Net it is called:
+	rank.
+	
+	float[,] tempsGrid = new float[4,3];  
+	
+Access:
+
+	tempsGrid[0,0];								- element access
+	
+	for(int x = 0; x < 4; x++)
+	{
+		for(int y = 0; y < 3; y++)
+		{
+			tempsGrid[x,y = x + 10 * y;
+		}
+	}
+	
+	foreach(float temperature in tempsGrid)		- this loop also displays all
+	{										    - element. 
+		Console.WiteLine(temperature);
+	}
+	
+	It is possible beacouse compiler create two nested for loop when notice
+	'foreach' enumearating two dimeensional array.
+	
+Length vs. Rank:
+
+	For multi-dimensional array this value are not the sema. Assuming we have
+	following array:
+	
+	float[,] tempsGrid = new float[4,3]; 
+	
+	tempsGrid.Length;			- result: 12 - lenght propertie return 
+								  total number of elements in the array
+	tempsGrid.GetLength(0);		- result: 4 - length of the first dimension
+	tempsGrid.GetLength(1);		- result: 3 - lenght of the second dimension
+	tempsGrid.Rank();			- result: 2 - number of dimensions
+	
+Indexes:
+
+	In standard arrays we have zero-based index rule. That means first element
+	has index 0 but we can change it.
+	
+	tempsGrid.GetLowerBound(0);		- returns the smallest valid index
+	tempsGrid.GetUpperBound(0);		- returns the bigest valid index
+	
+	Both methods have 0 as an argument it indicates that we want value from
+	first dimension.
+
+Jagged Arrays:
+
+	The idea is that - you can put any type in the array, including another
+	array. C# gives you very nice syntax to create this type of arrays.
+	
+	float[,] floatArrays2d;			- multi-dimensional array
+	float[][] floatArrayJagged; 	- array of arrays of floats
+	float[][][] testJagged;			- we can do futher nesting
+	
+	float[][] tempGrid = new float[4][];  - create Jagged array
+	
+	At this moment we dont know anything about the lenght of the 
+	arrays so we need to leave second bracket empty.
+	
+	Now any attempt to use the array return error. Becouse we have to
+	create inner arrays.
+	
+	tempGrid[0] = new float[3];
+	tempGrid[1] = new float[5];
+	tempGrid[2] = new float[2];
+	tempGrid[3] = new float[6];
+	
+	Rank 			  - 1  becouse we have one array that contain four arrays
+	Length			  - 4  bacouse we have four elements in one main array
+	
+	Multidimensional:
+		* one single array, 
+		* lightweight, 
+		* simpler
+	Jagged 			  
+		* lots of arrys, 
+		* more flexible,  
+		* inner arrays don't have to be the same lenght
+		
+		
+		
+		
+################################################################################
+#
+#		Nongeneric Collections (System.Collections) - obsolate
+#
+################################################################################
+
+
+- ArrayList : IList, ICollection, IEnumerable, ICloneable
+	
+	Dynamically sized collection of objects listed in sequential order.
+
+- BitArray : ICollection, IEnumerable, ICloneable
+	
+	Manages a compact array of bit values, which are represented as Booleans, 
+	where 	true indicates that the bit is on (1) and false indicates the bit 
+	is off (0).
+
+- Hashtable : IDictionary, ICollection, IEnumerable, ICloneable
+
+	Represents a collection of key/value pairs that are organized based on the 
+	hash code of the key.
+
+- Queue : ICollection, IEnumerable, ICloneable
+
+	Represents a standard first-in, firstout (FIFO) collection of objects.
+
+
+- SortedList : IDictionary, ICollection, IEnumerable, ICloneable 
+
+	Represents a collection of key/value pairs that are sorted by the keys and
+	are accessible by key and by index.
+
+- Stack : ICollection, IEnumerable, ICloneable
+
+	A last-in, first-out (LIFO) stack providing push and pop (and peek) 
+	functionality.		
+	
+	
+	
+	
+################################################################################
+#
+#							Lists
+#
+################################################################################		
+
+
+( System.Collections.Generic )
+List<T> 
+	* Extensive API
+	* Like array but with adding/removing el.
+( System.Collections.ObjectModel)
+ReadOnlyCollection<T>
+	* Read-only wrapper for lists
+Collection<T>
+	* Allows list to be custimized
+ObservableCollection<T>
+	* List with change notification
+	
+
+
+################################################################################
+
+	
+### List<T> : IList<T>, ICollection<T>, IEnumerable<T>, IReadOnlyList<T>,
+			  IList, ICollection, IEnumerable, IReadOnlyCollection<T>
+  
+
+How it works?
+
+	When you create List<T> in fact an array is created under the hood. The 
+	array that is created is bigget than required. Thanks to that new elements
+	can be dynamically added. 
+	
+	List<string> lista = new List<string>() { "CA", "BA", "AM", "DC", "EF" };
+	
+	lista.Count 	- propertie return number of element // 5
+	lista.Capacity  - return current size (capacity)     // 8
+	
+	As we already know elements are inside an array under the hood, so what 
+	will happen when we add a couple of new elements.  
+	
+	lista.Add("ER");	- count = 6 , capacity = 8
+	lista.Add("AG");	- count = 7 , capacity = 8
+	lista.Add("PT");	- count = 8 , capacity = 8
+	lista.Add("QQ");	- count = 9 , capacity = ????  - it is 16 (doubled)
+	
+	When list try to add a new element it notice that is not possible. There 
+	is no place so the current array is acctualy useless. This array is 
+	discarded and new ona is twice as big is created. All elemet are copied
+	and our new element is added at the end of new array. Performence 
+	surely suffer. To avoid that we can declare how big capacity schould be
+	when the list is created. 
+	
+	List<string> lista = new List<string>(20) { "CA", "BA", "AM", "DC", "EF" };
+	
+	list.Count 		- is 5
+	list.Capacity 	- is 20 (in accordance with our declaration)	
+			 
+	To remove element from particular posstion. List must move up all the other
+	element that was located after our element (wors performance expecialy if
+	the removed elemenet is at the begining of the list becouse the list has to
+	move all elements up) and then decrise the count property.
+	
+	list.Remove("ER");	- first the element must be found (going through
+						  all elements of the list always takes longer)
+	list.RemoveAt(6);   - searching is not required
+			 
+	When we remove the elements capacity have not changed at all. 
+			 	 
+Main point:
+
+	- strongly typed
+	- one-dimensional
+	- expandable 
+	- can add, inser, or remove elements
+	- accessed using index
+
+Initialization:
+
+	List<string> colorOptions;				- list declration
+	colorOptions = new List<string>();		- creating new instance
+
+	List<string> colorOptions = new List<string>();
+	var colorOptions = new List<string>();
+	var colorOptions = new List<string>() { "Red", "White" };
+
+Access:
+
+	colorOptions[0];
+
+Methods:
+
+colorOptions.Count;						- return number of element
+colorOptions.Capacity;					- return current size (it is not a part of any interace)
+colorOptions.Add("Black");				- add element at the end
+colorOptions.Insert(2, "Purple");		- insert element
+colorOptions.Remove("White");			- remove firtst matching element
+										  slow (sequential search are required);
+colorOptions.RemoveAt(1);				- remove el. at index 1. No search are required
+colorOptions.AsReadOnly();				- method provides a vraper for List<T>. New reference
+										  do not provide modification methods. But all
+										  changes in oryginal list are visable in read-only reference.
+										  
+										  
+										  
+################################################################################
+
+
+### ReadOnlyCollection<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>,   
+							IList, IList<T>, IReadOnlyList<T>, 
+							IEnumerable, IEnumerable<T>,
+							
+
+	It is realy a list (implement IList) instead of Collection. Index access is 
+	possible. You can not add any element to the read-only collection.
+	So you have to provide a reference for the underlying list in the constructor.
+
+	List<string> lista = new List<string>() { "CA", "BA", "AM", "DC", "EF" };
+							
+	var readOnly = new ReadOnlyCollection<string>(lista);  // efect is the same
+    var readOnly = lista.AsReadOnly();
+	
+	Read-only is a wrapper around the collection<T> that is pass to its 
+	constructor.
+
+
+
+################################################################################
+
+
+### Collection<T> : IList, IList<T>, IReadOnlyList<T>,
+					ICollection, ICollection<T>, IReadOnlyCollection<T>
+					IEnumerable,  IEnumerable<T>,  
+
+
+	Class is design to give you an implementation of IList<T>. But we have 
+	one class List<T> do the same. So what is the differents?
+	
+	List<T> is design to be as Lightweight and efficient as possible. But non 
+	of its methods are virtual. There is no way to extend the functionality of
+	List<T> (not customizable). Collection<T> is not as efficient as the List<T>
+	but is ideal when you need a collection that schould be castamized in some way. 
+	
+	Collection<T> encapsulate underling list (like ReadOnlyCollection<T>). 
+	Altouhg Add() method is not virtual it call internally protected virtual
+	InsertItem() method. The second ona can be overriden. We have a couple of 
+	additional method, some of them non-generic like: public IList.Insert(),
+	public IList.this[], but all of thehe methods call internally:
+	- protected virtual InsertItem()
+	- protected virtual SetItem()
+
+	If you want to custamize collection behavior you only need to override this
+	two method.
+	
+	Lets assume you want a collection of string that accepts only non-whitespace.
+	non-null strings. 
+			
+			
+	class NonBlankStringList : Collection<string>
+        {
+            protected override void InsertItem(int index, string item)
+            {
+                if (string.IsNullOrWhiteSpace(item))
+                    throw new ArgumentException("El. must not be null or whitespace");
+                base.InsertItem(index, item);
+            }
+
+            protected override void SetItem(int index, string item)
+            {
+                if (string.IsNullOrWhiteSpace(item))
+                    throw new ArgumentException("El. must not be null or whitespace");
+                base.SetItem(index, item);
+            }
+        }	
+
+
+
+################################################################################
+
+
+### ObservableCollection<T> : 	
+
+
+public class ObservableCollection<T> : Collection<T>, I
+									   NotifyCollectionChanged, 
+									   INotifyPropertyChanged	
+{
+	public ObservableCollection();
+	public ObservableCollection(IEnumerable<T> collection);
+	public ObservableCollection(List<T> list);
+	
+	....
+	public void Move(int oldIndex,int newIndex);
+	protected virtual void MoveItem(int oldIndex,int newIndex);
+	protected override void RemoveItem(int index);
+	protected override void SetItem(int index,T item);
+	protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e);
+	protected virtual void OnPropertyChanged(PropertyChangedEventArgs e);
+	
+	public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
+	protected virtual event PropertyChangedEventHandler PropertyChanged;
+	event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged;
+}
+
+
+	It is a list that provides notification when anything in a list changes. 
+	It is also highly extensible (like Collection<T>). Many methods has been 
+	marked as a virtual so they can be easly overriden using the same rules as 
+	we know from Collection<T> class.
+					
+	ObservableCollection<string> presidents = new ObservableCollection<string>()
+	{
+		"Jimmy Carter", "Ronald Reagan", "George HW Bush"
+	};
+	
+	presidents.CollectionChanged += OnCollectionChanged;
+
+	presidents.Add("Bill Clinton");
+	presidents.Remove("Jimmy Carter");				
+
+	void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+	{
+		Console.WriteLine(e.Action);
+	}
+
+	
+	
+	
+################################################################################
+#
+#					Linked Lists, Stacks and Queues
+#
+################################################################################
+
+
+( System.Collections.Generic (all) )
+
+LinkedList<T>
+	* List with fast adding/removing elements
+LinkedListNode<T>
+	* Required to store items in a linked list
+Stack<T>
+	* First-in last-out list
+Queue<T>
+	* First-in first-out list
+
+	
+	
+################################################################################
+
+
+### LinkedList<T>
+
+
+public class LinkedList<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>,
+							 IEnumerable, IEnumerable<T>, ISerializable, 
+							 IDeserializationCallback
+{
+	public LinkedList();
+	public LinkedList(IEnumerable<T> collection);
+	protected LinkedList(SerializationInfo info, StreamingContext context);
+
+	public int Count { get; }				 // Gets the number of nodes actually contained in the LinkedList<T>
+	public LinkedListNode<T> First { get; }	 // Gets the first node of the LinkedList<T>.
+	public LinkedListNode<T> Last { get; }   // Gets the last node of the LinkedList<T>.
+	
+	public LinkedListNode<T> AddFirst(T value);
+	public LinkedListNode<T> AddLast(T value);
+	public LinkedListNode<T> AddAfter(LinkedListNode<T> node,T value);
+	public LinkedListNode<T> AddBefore(LinkedListNode<T> node,T value);
+	public void AddFirst(LinkedListNode<T> node);
+	public void AddLast(LinkedListNode<T> node);
+	public void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode);
+	public void AddBefore(LinkedListNode<T> node,LinkedListNode<T> newNode);
+	public void RemoveFirst();
+	public void RemoveLast();
+	public bool Remove(T value);
+	public void Remove(LinkedListNode<T> node);
+}
+
+
+	The purpose is to provide beter performance when we need to add or remove
+	elements very quickly. 
+	
+	- adding / removing elements is FAST
+	- good at enumerating
+	- no index-base access to elemenets
+	- use lots of memory ( additional references for eatch element)
+	
+How it works:
+	When we allocate all block of memory at once and we create a list base on 
+	the array under the hood we need to move all the element down if we want
+	to remove the elemenet at the begining of the list. 
+	
+	I would be greate to have a element in different place in memory in order to
+	easy add or remove another elements in any place. But we need to determinate
+	in some way the order of the element, whitch elemenet is next and witch one
+	is previous. So we need a pointer to show us when the next elemenet can be
+	found. 
+	
+	Because we do not know where particular element is unless we go througt 
+	all the elemenets (using next / previos chain), therefore we can not 
+	access particular element directly. (we must enumerate all the previos one).
+	
+	To add or remove an element nothing has to be move in memory. We need to
+	only update pointers of the neighbor elements.
+	
+	LinkedList<T> is a list that is in fact a colletion of LinedListNode<T> 
+	element.
+	
+	Initializers are not allowed!!!!
+	
+	var presidents = new LinkedList<string>();
+
+	presidents.AddLast("Jimmy Carter");
+	presidents.AddLast("Ronald Reagan");
+	presidents.AddLast("George HW Bush");
+	presidents.AddLast("JFK");
+	
+LinkedListNode<T>
+
+	Is a special type that collect (and encapsulate) all information required to
+	add new element to LinkedList<T>
+	
+	previous el.   ->  elemenet value  <- next el.
+	
+	LinedListNode<string> nixon = presidents.Find("Ronald Reagan")
+	presidents.AddAfter(nixon, "Gerald Ford");
+	
+	Its is not very efficient it would be better to keep the reference to 
+	particular element.
+	
+	LinkedListNode<string> kennedy = presidents.AddFirst("John F Kennedy");
+	
+	presidents.Remove("Gerald Ford");  // it is also not very efficient
+	presidents.RemoveFirst();
+	presidents.AddFirst("Gerald Ford");
+	
+Methods:
+
+	AddAfter    - Adds a new node containing the specified value after the 
+			      specified existing node in the LinkedList<T>.
+	AddBefore   - Adds a new node containing the specified value before the 
+			      specified existing node in the LinkedList<T>.
+	AddFirst    - Adds a new node containing the specified value at the start.
+	AddLast     - Adds a new node containing the specified value at the end.
+	Remove      - Removes the first occurrence of the specified value.
+	RemoveFirst - Removes the node at the start of the LinkedList<T>.
+	RemoveLast  - Removes the node at the end of the LinkedList<T>.
+	Remove(LinkedListNode<T>) - Removes the specified node.
+
+	
+	
+################################################################################
+
+
+### Stack<T>
+
+
+public class Stack<T> :  IEnumerable, IEnumerable<T>, ICollection, 
+						 IReadOnlyCollection<T>
+{
+	public Stack();
+	public Stack(IEnumerable<T> collection);
+	public Stack(int capacity);
+	
+	public void Push(T item)   // Inserts an object at the top of the Stack<T>
+	public T Pop();			   // Removes and returns the object at the top.
+	public T Peek();		   // Returns the object at the top without removing it.
+	
+	public void TrimExcess()   // Sets the capacity to the actual number of 
+								elements in the Stack<T>, if that number is less than 
+								90 percent of current capacity.
+}
+
+	The only place you can ever add or remove an element is the top of the 
+	stack. It is last-in first-out collection.
+
+	Initializers are not allowed!!!!
+	
+	var books = new Stack<string>();
+	
+	books.Push("Programming WPG");
+	books.Push("The Philosophy Book");
+	books.Push("Heat and Thermodynamics");
+
+	foreach loop will display the book in reverse order.
+
+	
+	
+################################################################################
+
+
+### Queue<T>
+
+
+public class Queue<T> : IEnumerable, IEnumerable<T>, ICollection, 
+						IReadOnlyCollection<T>
+{
+	public Queue();
+	public Queue(IEnumerable<T> collection);
+	public Queue(int capacity);
+	
+	public void Enqueue(T item);  // Adds an object to the end of the Queue<T>.
+	public T Dequeue();           // Removes and returns the object at the beginning
+	public T Peek();              // Returns the object at the beginning without removing it.
+	
+	public void TrimExcess()      //  
+}
+
+
+	The only item you can remove from the collection is the earliest item that 
+	you put in the collection. (the oldest). First-in first-out collection;
+	
+	Common scenario when queues are usfull is working with tasks.
+	
+	Initializers are not allowed!!!!
+	
+	var tasks = new Queue<strin>();
+	
+	tasks.Enqueue("Do the washing up");
+	tasks.Enqueue("Buy some chocolate");
+	tasks.Enqueue("Buy some more chcolate");
+	
+	string nextTask = tasks.Dequeue(); 
+	string nexstTask2 = tasks.Peek();
+	
+	foreach - works for queues in standard order.
+
+	
+
+################################################################################
+
+	
+List type summary:
+
+* System.Array
+  - multiple dimensions
+  - small performance benefit with large fixed number of elements
+* System.Collections.Generic.List<T>
+  - most often used
+* System.Collections.Generic.LinkedList<T>
+  - linked to element before it and after it in sequence
+  - insert / remove elements in the middle of list
+* System.Collections.Generic.Queue<T>	(fifo)
+  - discard element after retrieval
+  - access elements in same order as they were added 
+* System.Collections.Generic.Stack<T>	(lifo)
+  - discard element after retrieval
+  - access last added element first 
+* System.Collections.ObjectModel.ObservableCollection<T>				  
+  - notification when item are added, removed or refreshed
+* System.Collections.Specialized.StringCollection
+* System.Collections.Concurrent
+  - thread-safe list classes
+
+
+
+
+################################################################################
+#
+#						      Dictionaries
+#
+################################################################################
+
+
+( System.Collections.Generic ) 
+Dictionary<TKey, TValue>
+	* General purpose dictionary
+( System.Collections.ObjectModel )
+ReadOnlyDictionary<TKey, TValue>
+( System.Collections.Generic ) 
+SortedList<TKey, TValue> amd SortedDictionary<Tkey, TValue>
+	* Dictionaries that sort their elements
+( System.Collections.ObjectModel )
+KeyedCollection<TKey, TValue>
+	* Customizable
+Hash tables
+	* Hash codes
+	
+
+
+################################################################################
+
+
+### Dictionary<TKey, TValue> 
+
+
+Dictionary<TKey, TValue> : IDictionary<TKey,TValue>, IDictionary,
+						   ICollection<KeyValuePair<TKey,TValue>, ICollection
+						   IEnumerable<KeyValuePair<TKey,TValue>, IEnumerable,
+						   IReadOnlyDictionary<TKey,TValue>, 
+						   IReadOnlyCollection<KeyValuePair<TKey,TValue>, 
+						   ISerializable, IDeserializationCallback
+{
+	public Dictionary();
+	public Dictionary(IDictionary<TKey,TValue> dictionary;
+	public Dictionary(IDictionary<TKey, Value> dictionary, IEqualityComparer<TKey> comparer);
+	public Dictionary(IEqualityComparer<TKey> comparer);
+	public Dictionary(int capacity);
+	public Dictionary(int capacity,IEqualityComparer<TKey> comparer);
+	protected Dictionary(SerializationInfo info,StreamingContext context);
+	
+	public IEqualityComparer<TKey> Comparer { get; }
+	public int Count { get; }
+	public TValue this[TKey key] { get; set; }
+	public Dictionary<TKey,TValue>.KeyCollection Keys { get; }
+	public Dictionary<TKey,TValue>.ValueCollection Values { get; }
+	
+	public void Add(TKey key,TValue value);
+	public bool ContainsKey(TKey key);
+	public bool ContainsValue(TValue value);
+	public bool Remove(TKey key);
+	public bool TryGetValue(TKey key, out TValue value);
+}
+
+
+Main Point:
+	- Contains el. defined as key and value pairs	
+	- Not sorted	
+	- Accessed by key (good performance)					
+	- Key must be unique
+	- Key must not be changed
+	- Key cannot be null
+	- Keys of course are case-sensitive
+	- Values can be duplicated
+	- Good all-roung performance (adding/removing/accessing elements)
+	
+How they works:
+
+	Dictionary contain a number things called 'backets' (pice of memmory). 
+	Internal structure of the backet is simillar to linked list. 
+	
+	When we add new element to the dictionary - it looks at the key and it does
+	some procesing on the value of the key (using some algorithm). Ther rusult 
+	of this processing is used to decide on the backet to put new elements in.
+	(witch backet schould be used). Algorith distributs elements over all the
+	backets fairly evenly.
+	
+	When we look up the element with key. Dictionary uses the same algorithm to
+	determinte in which backet the element is. After that dictionary iterate
+	over the backet looking for this particular key. (going through elements 
+	one by one).
+	
+	This works well for performance of the dictionary. (good balance between 
+	number of backets and number of elemenets is importent).
+	
+	HashCode - it is a thing that dictionary uses to identify backets.
+			   Code is provided by GetHashCode method that comes from object type.
+			   (so every object has this method). Only purpose of having every
+			   object implement GetHashCode is to allow object to be used as 
+			   dictionary key.
+			   
+			   For example "CA" and "ca" have different HashCode that is why
+			   by default this two keys are assumed to be different.
+			
+Initialization:
+							
+	Dictionary<string, string> states;			- dictionary declaration
+	states = new Dictionary<string, string>();  - creating new instance
+						
+	var states = new Dictionary<string, string>(); 	
+	vat states = new Dictionary<string, string>()
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+
+	foreach(var state in states)		// our state has type: 
+	{								    // System.Collections.GenericKeyValuePair<TKey,TValue>
+		Console.WriteLine(state);		// under the hood dictionary is a collection 
+	}									// of object that have mentioned type.
+	
+	
+	Lets assume we want to add new element like that:
+	
+	states.add("ca", "California");     // it is allowed according to our implementation
+	
+	How to block it? We need to provide Directory with IEqualityComparer<TKey>
+	implementation. 
+	
+	var states = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+	
+	StringComparer is class implementation (build in) which implement mentioned
+	interface.
+		
+Methods:
+		
+	states["CA"];							- return "California"
+	states["CA"] = "California2";			- replacing element
+	states.ContainsKey("CA");				- return true / false 
+	states.TryGetValue("CA", out state);	- reutrn false if no key "CA" exists
+	states.Add("CA", "California")			- (key, value) add new element if not exist 
+	states.Remove("CA");					- remove element
+	state.Key  or  state.value				- used during iteration
+	states.Keys 							- return a collection of keys 
+	states.Values 							- return a collection of values
+
+	
+	
+################################################################################
+
+
+### ReadOnlyDictionary<TKey, TValue>
+
+
+	Dictionary equivalent for ReadOnlyCollection for Lists. It provides a
+	wrapper around ordinary dictionary (encapsulate underlying dictionary) in 
+	order to get read-only access. You must supply read-only dictionary with
+	standard dictionary (only this constructor exist). (underlying dictionary
+	can be everything that provides IDictionary<TKey, TValue interace)
+	
+	No ability to modify dictionary is exposed!! 
+		
+public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey,TValue>, IReadOnlyDictionary<TKey,TValue>,
+												ICollection<KeyValuePair<TKey,TValue>>,  IReadOnlyCollection<KeyValuePair<TKey,TValue>>
+												IEnumerable<KeyValuePair<TKey, TValue>>,
+												ICollection, IEnumerable, IDictionary, 
+{
+	public ReadOnlyDictionary(IDictionary<TKey,TValue> dictionary);
+	
+	public int Count { get; }											    // Gets the number of items in the dictionary.
+	protected IDictionary<TKey,TValue> Dictionary { get; }				    // Gets the dictionary that is wrapped by this ReadOnlyDictionary
+	public TValue this[TKey key] { get; }								    // Gets the el. that has the specified key.
+	public ReadOnlyDictionary<TKey,TValue>.KeyCollection Keys { get; }      // Gets a key collection that contains the keys
+	public ReadOnlyDictionary<TKey,TValue>.ValueCollection Values { get; }  // Gets a collection that contains the values
+	
+	public bool ContainsKey(TKey key);						// Determines whether the dictionary contains an el. that has the specified key.			
+	public bool TryGetValue(TKey key, out TValue value);    // Retrieves the value that is associated with the specified key.
+}
+	 
+	
+Initialization:
+	
+	vat states = new Dictionary<string, string>()
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+
+	var statesReadOnly = new ReadOnlyDictionary<string, string>(states);
+
+
+
+################################################################################
+
+
+### SortedList<Tkey, TValue>
+
+
+	It is a dictionary that automaticaly keep its values sorted. Dont be confuse
+	be the name. For all operation this type act as a Dictionary but there is
+	a significant diffrence under the hood.
+	
+	There is no hash table in internal implementation. Instead, the elements
+	are sorted by the key and then store basically in a list (actually two
+	lists one for keys and one for values). 
+	
+	Becouse of the list is sorted by the key looking up the values using the 
+	keys is very fast (binary search) but the list must be keep in special order
+	so every modification is quite expensive. 
+
+	Sorting can be done base on buildin .NET assumption. SortedList already
+	knows how to sort keys that are: string or number. If we want to create 
+	this dictionary with custom type (custom sorting behavior) we need to pass
+	class that implement IComparer<T> to define required sort method.
+	
+	
+public class SortedList<TKey, TValue> : IDictionary, IDictionary<TKey,TValue>, 
+										IReadOnlyDictionary<TKey,TValue>, 
+										ICollection, ICollection<KeyValuePair<TKey,TValue>>, 
+										IReadOnlyCollection<KeyValuePair<TKey,TValue>>
+										IEnumerable, IEnumerable<KeyValuePair<TKey,TValue>>, 
+{
+	public SortedList();
+	public SortedList(int capacity)
+	public SortedList(IComparer<TKey> comparer);
+	public SortedList(int capacity,	IComparer<TKey> comparer);
+	public SortedList(IDictionary<TKey,TValue> dictionary);
+	public SortedList(IDictionary<TKey,TValue> dictionary,	IComparer<TKey> comparer);
+	
+	public int Count { get; }						// Gets the number of key/value pairs contained in the SortedList<TKey,TValue>.
+	public int Capacity { get; set; }				// Gets or sets the number of elements
+	public IComparer<TKey> Comparer { get; }		// Gets the IComparer<T> for the sorted list.
+	public TValue this[TKey key] { get; set; }		// Gets or sets the value associated with the specified key.
+	public IList<TKey> Keys { get; }				// Gets a collection containing the keys 
+	public IList<TValue> Values { get; }			// Gets a collection containing the values
+	
+	public void Add(TKey key,TValue value);			// Adds an element with the specified key and value
+	public bool ContainsKey(TKey key);				// Determines whether the SortedList<TKey, TValue> contains a specific key.
+	public bool ContainsValue(TValue value);		// Determines whether the SortedList<TKey, TValue> contains a specific value.
+	public int IndexOfKey(TKey key);				// Searches for the specified key and returns the zero-based index
+	public int IndexOfValue(TValue value);			// Searches for the specified value and returns the zero-based index of the first occurrence 
+	public bool Remove(TKey key);					// Removes the element with the specified key 
+	public void RemoveAt(int index);				// Removes the element at the specified index 
+	public bool TryGetValue(TKey key,out TValue value);
+	public void TrimExcess()
+}
+	
+Initialization:
+
+	vat states = new SortedList<string, string>()
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+	
+	By default elemenets bill be sorted in alphabetical order. We can provide
+	some standard comparer ex: 
+	
+	var states  = new SortedList<string, string>(string.InvariantCultureIgnoreCase)
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+	
+	Now we can not add states.Add("ca", "California2");
+	
+	We can also write our own implementation of IComparer<T>. Look at 
+	interaces section. 
+	
+	var states  = new SortedList<string, string>(new UncasedStringComparer)
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+
+
+
+################################################################################
+
+
+### SortedDictionary<Tkey, TValue>
+	
+	
+	In terms of functionality SortedDictionary and SortedList are exactly the
+	same. (the same methods, the same interfaces).
+
+	The diffrence are in internal implementation. SortedDictionary keeps 
+	elements in structure called Balancedtree (chierarchical structure 
+	optimalized for fast elements look-up ). It has complex implementation 
+	details. In comparison with SortedList we get:
+	
+	* Fast modification  ( SortedList - slow)
+	* Fast look-up 		 ( SortedList guarantee the same)
+	* More complex structure ( SortedList is low overhead )
+	
+public class SortedDictionary<TKey, TValue> : IDictionary, IDictionary<TKey,TValue>, 
+											  IReadOnlyDictionary<TKey,TValue>, 
+											  ICollection, ICollection<KeyValuePair<TKey,TValue>>,
+											  IReadOnlyCollection<KeyValuePair<TKey,TValue>>
+											  IEnumerable, IEnumerable<KeyValuePair<TKey,TValue>>, 
+{
+	public SortedDictionary();
+	public SortedDictionary(IComparer<TKey> comparer);
+	public SortedDictionary(IDictionary<TKey,TValue> dictionary);
+	public SortedDictionary(IDictionary<TKey, TValue> dictionary,IComparer<TKey> comparer);
+	
+	public IComparer<TKey> Comparer { get; }				// Gets the IComparer<T> used to order the elements of the SortedDictionary<TKey, TValue>.
+	public int Count { get; }											// Gets the number of key/value pairs contained
+	public TValue this[TKey key] { get; set; }							// Gets or sets the value associated with the specified key.
+	public SortedDictionary<TKey,TValue>.KeyCollection Keys { get; }
+	public SortedDictionary<TKey,TValue>.ValueCollection Values { get; }
+	
+	public void Add(TKey key,TValue value);								// Adds an element with the specified key and value
+	public bool ContainsKey(TKey key);
+	public bool ContainsValue(TValue value);
+	bool Remove(TKey key;												// Removes the element with the specified key 
+	public bool TryGetValue(TKey key,out TValue value);					// Gets the value associated with the specified key.
+	public void CopyTo(KeyValuePair<TKey,TValue>[] array,int index);
+}
+	
+Implementation:
+	
+	vat states = new SortedDictionary<string, string>()
+	{
+		{"CA", "California"},	{"WA", "Washington"},	{"NY", "New York"},
+	};
+
+
+
+################################################################################
+
+
+### KeyedCollection<Tkey, TValue>
+
+
+	Keyed collection is abstract - to implement it you must derived from it.
+	This colleciton can autmoaticaly extract keys from values. Collection also
+	allows you to custimize dictionary behavior by overriding its method.
+
+	Under the hood KeyedCollection is not only a dictionary is a list as well.
+	This collection stores a list of its item and separetlly a dictionary of
+	its item as well. So you get a two collection in one (kept in sync).
+	You can look elements by key and also by index.
+	
+	
+	
+public abstract class KeyedCollection<TKey, TItem> : Collection<TItem>
+{
+	protected KeyedCollection();
+	protected KeyedCollection(IEqualityComparer<TKey> comparer);
+	protected KeyedCollection(IEqualityComparer<TKey> comparer, int dictionaryCreationThreshold);
+	
+	public IEqualityComparer<TKey> Comparer { get; }
+	public int Count { get; }
+	protected IDictionary<TKey, TItem> Dictionary { get; }
+	public TItem this[TKey key] { get; }
+	public T this[int index] { get; set; }
+	protected IList<T> Items { get; }
+	
+	public void Add(T item);
+	protected void ChangeItemKey(TItem item,TKey newKey);
+	public bool Contains(T item);
+	public bool Contains(TKey key);
+	public int IndexOf(T item);
+	public void Insert(int index,T item);
+	protected override void InsertItem(int index,TItem item);
+	public bool Remove(T item);
+	public bool Remove(TKey key);
+	public void RemoveAt(int index);
+	protected override void RemoveItem(int index);
+}
+
+Implementation:
+
+	class PrimeMinster 
+	{
+		public int YearElected;
+		public string name;
+	}
+
+	class PrimeMinisterByYearDictionary : KeyedCollection<int, PrimeMnister>
+	{
+		protected override int GetKeyFromItem(PrimeMinster item)
+		{
+			return item.YearElected;
+		}
+	}
+	
+	var primeMnisters = new PrimeMinisterByYearDictionary()
+	{
+		new PrimeMnister("James Callaghan", 1994),
+		new PrimeMinster("Margaret Thatchar", 1979),
+		new PrimeMinster("Tony Blair", 1997)
+	};
+	
+	Be carefull when you use int as a key. Bocouse there is a little conflict
+	with index. As a result when you do something like that:
+	
+	primeMnisters[0]  - you get and error telling you there is no such a key
+	
+	KeyedCollection tryes to search looking for a 0 keys. To go around this
+	problem you can temporally cast collection to IList.
+	
+	(IList<PrimeMinster>)primeMnisters[0]  - it works!
+	
+	If you decide to use string key the problem never appear!
+
+
+################################################################################
+	
+	
+Dictionary types summary:
+
+* System.Collections.Generic.Dictionary<Tkey, TValue>
+* System.Collections.Generic.SortedList<Tkey, TValue>
+  - sorted by key
+  - faster when populating from sorted data
+* System.Collections.Generic.SortedDictionary<Tkey. TValue>
+  - sorted by key
+  - faster from populating unsorted data
+* System.Collections.ObjectModel.ReadOnlyDictionary
+* System.Collections.ObjectModel.KeyedCollection
+* System.Collections.Specialized.OrderedDictionary
+* System.Collections.Concurrent
+  - thread-safe dictionary classes
+
+  
+  
+  
+################################################################################
+#
+#						       Sets
+#
+################################################################################
+
+
+(  System.Collections.Generic ) 
+HashSet<T>
+SortedSet<T>
+
+
+ 
+################################################################################
+
+
+### HashSet<T>
+  
+
+	It represent a collection of element that have no order or location in the
+	sets. Element is in the collection or it is not (only information that
+	HasSet<T> give you). So there is no index or any keys just elements values
+	nothing else. There is no way to look-up the element. The only way is to
+	iterate over it.
+  
+	This collection is implemented internally using hashtable. Internal hashtable
+	is based on the element value directly. 
+	
+	Main adaventage of HashSet<T> is to guarantee uniqueness. 
+	
+  
+  
+  
+public class HashSet<T> : ISet<T>, IEnumerable, IEnumerable<T>, ICollection<T>, 
+						  ISerializable, IDeserializationCallback, IReadOnlyCollection<T>
+{
+	public HashSet();
+	public HashSet(IEnumerable<T> collection);
+	public HashSet(IEnumerable<T> collection,IEqualityComparer<T> comparer);
+	public HashSet(IEqualityComparer<T> comparer);
+	protected HashSet(SerializationInfo info,StreamingContext context);
+	
+	public IEqualityComparer<T> Comparer { get; }
+	public int Count { get; }
+
+	public bool Add(T item);
+	public bool Contains(T item);
+	public static IEqualityComparer<HashSet<T>> CreateSetComparer();
+	public void ExceptWith(IEnumerable<T> other);
+	public void IntersectWith(IEnumerable<T> other);	
+	public bool IsProperSubsetOf(IEnumerable<T> other);
+	public bool IsProperSupersetOf(IEnumerable<T> other);
+	public bool IsSubsetOf(IEnumerable<T> other);
+	public bool IsSupersetOf(IEnumerable<T> other);
+	public bool Overlaps(IEnumerable<T> other;
+	public bool Remove(T item);
+	public int RemoveWhere(Predicate<T> match;
+	public bool SetEquals(IEnumerable<T> other);
+	public void SymmetricExceptWith(IEnumerable<T> other;
+	public void UnionWith(IEnumerable<T> other);
+	public void TrimExcess();
+}  
+
+Initialization:
+
+	var bigCities = new HashSet<string>()
+	{
+		"New York", "Manchaster", "Sheffield", "Paris" 
+	};
+
+	bigCities.Add("Paris"); 	- if element exist nothing has been changed.
+								  el. will not be added again. 
+								  
+	bool result = bigCities.Add("Paris");  - true - means element has been added
+										   - false - elemenet are already in the list
+										   
+    HasSet<T> do checking and adding operation very quickly. Lets experiment
+	with how this collection determinate if particular element schould be 
+	added. 	
+	
+	bigCities.Add("PAris");		- by default element will be added to the collection.
+	
+	To fix this problem we need to define how to test the equality. The way we
+	do it is like always: we need to pass object that implement IEqualityComparer<T>
+	interface to the constructor.
+	
+	var bigCities = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
+	{
+		"New York", "Manchaster", "Sheffield", "Paris" 
+	};
+	
+	bigCities.Add("PAris");		- elemenet will not be added 	
+	
+Methods:
+	
+    All methods are explained in ISet<T> description
+
+	
+	var biCities = new HasSet<string> { "New York", "Manchaster", "Sheffield", "Paris" };
+	
+	string[] cietiesInUk = { "Sheffield", "Ripon", "Truro", "Manchaster"};
+	
+	bigCities.IntersectWith(cietiesInUk); 		// Manchaster, Sheffield
+	
+	Above example modified the colleciton inline. No new object has been created. 
+	It is good from the performance point of view bud looks badly and the collection
+	name mislead us. (original hashset has been changed)
+	
+	We can do the same using LINQ method. This method returns IEnumerable<T>.
+	
+	var newCieties = biCities.Intersect(cietiesInUk);
+	
+	This is easier to read. And this method is available as extensive method
+	for all colleciton that implement IEnumerable<T>. But!! we lose good
+	performance. (the main adaventage).
+	
+	biCities.UnionWith(cietiesInUk);		   // New York, Manchaster, Sheffield, Paris, Ripon, Truro
+	biCities.SymmetricExceptWith(cietiesInUk); // New York, Paris, Ripon, Truro
+	biCities.ExceptWith(cietiesInUk);		   // New York, Paris
+
+	We can also determinate when the collection are equal base on values.
+	
+	var bigCities1 = new HasSet<string> { "New York", "Paris", "Manchaster" };
+	var bigCities2 = { "Paris", "Manchaster", "New York" };
+	var bigCities3 = new HasSet<string> { "New York", "Paris", "Ripon"};
+	
+	bool areEqual = biCities1.SetEquals(biCities2);   // true
+	bool areEqual = biCities1.SetEquals(biCities3);   // false
+	bool areEqual = biCities2.SetEquals(biCities3);   // false
+	
+	Following methods are interesting and have no LINQ equivalents.
+	
+	SetEquals, IsSubsetOf, IsSubsetOf, Overlaps, IsProperSubsetOf, IsProperSupersetOf
+	
+	
+	
+	
+################################################################################
+
+
+### SortedSet<T>
+
+
+	It does exactly the same for set us sorted dictionary does for dictionaries.
+	It gives you exactly the same functionality but internally instead of using
+	hashsettable uses balanced tree which keeps the elements sorted. To make
+	it usefull you must specify method to compare element.
+	
+	The fact that the elements are soreted internally has no effect for the 
+	rest of the functionality. Uniqueness works exactly the same.
+	
+
+public class SortedSet<T> : ISet<T>, IEnumerable, IEnumerable<T>, ICollection, ICollection<T>, 
+						    ISerializable, IDeserializationCallback, IReadOnlyCollection<T> 
+{
+	public SortedSet();
+	public SortedSet(IComparer<T> comparer);
+	public SortedSet(IEnumerable<T> collection);
+	public SortedSet(IEnumerable<T> collection,	IComparer<T> comparer);
+	protected SortedSet(SerializationInfo info,	StreamingContext context);
+	
+	....
+	....
+}
+
+Initialization:
+
+	var bigCities = new SortedSet<string>()
+	{
+		"New York", "Manchaster", "Sheffield", "Paris" 
+	};
+	
+	We get the same collection but in Sorted list elements will be presented in 
+	alphabetical order. 
+
+	bigCities.Add("NEW Your"); 		// it works unless we determinates the way
+									   we want to compare elements.
+
+	var bigCities = new SortedSet<string>(String.InvariantCultureIgnoreCase)
+	
+	Above works like always.
+	
+	To specify methods basne on elements going to be compared, we have to 
+	pass object that implement IComparer<T> interface in the constructor.
+	
+	
+
+
+################################################################################
+#
+#						System.Collections.Specialized
+#
+################################################################################
+
+
+### HybridDictionary 
+
+This class implements IDictionary by using a ListDictionary while the collection
+is small, and then switching to a Hashtable when the collection gets large.
+
+### ListDictionary 
+
+This class is useful when you need to manage a small number of items (10 or so)
+that can change over time. This class makes use of a singly linked list to 
+maintain its data.
+
+### StringCollection 
+
+This class provides an optimal way to manage large collections of string data.
+
+### BitVector32 
+
+This class provides a simple structure that stores Boolean values and small
+integers in 32 bits of memory.
+
+
+
+
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+
+
+UWAGA!!!
+
+1. sprawdz czy istnieje cos takiego jak tuple
+2. po przeroieniu kolekcji powtórz LINQ
+
+
+CIEKAWOSTKi:
+
+
+### All microsoft collections are reference type 
+
+### All value type have System.ValueType in inharitance hierarchy
+
+
+### According to OOP  collection with base type can store objects that have
+    derived type.
+### Equel operator in collection:   == operator compares references not the values: 
+
+int[] x1 = {1,2,3};  int[] x2 = {1,2,3}; int[] x3 = x1;
+
+x1==x2 // false 
+x1==x3 // true
+
+
+### Loop 
+
+foreach loop
+	- can't replace elements	
+	- can modify values of elements	(beacouse we are working with references)
+readonly collection
+	- can't replace elements
+	- can modify values of elements
+
+### Explicit interface implementation
+
+	If you interface is implemented explicitly - you dont have access to its
+	method from the class instance level. You can only access it using 
+	object that is converted to this specific interface.
+
+### Covariance && Contravariance
+
+Covariance:
+
+	Implicit casting derived type to base type. (More general type);
+	(I can always do that)
+	
+	Derived -> Base
+	Class -> Interfaces
+	
+	string str = "Hello, World";
+	object obj = str;
+	
+	Collections && interfaces interesting examples:  
+	
+	1.	
+		var strList = new List<string> { "aa", "bb", "cc"};
+		List<object> objList = strList;    <-------------- ERROR !!!
+		
+		Thouse type are tottaly different. They has been created base on the same
+		List<T> type but - there is no inharitance relationship.
+	2. 
+		var strArray = new string[] { "aa", "bb", "cc"};
+		object[] objArray = strArray;	  <--------------- OK !!!
+		objArray[0] = 5; 				  <--------------- ERROR !!!
+	
+		This kind of casting is allowed for arrays. It is called Array 
+		Covariance. (this is very bad things).
+	3.
+		var strList = new List<string> { "aa", "bb", "cc"};
+		IEnumerable<object> objEnum = strList;  <--------- OK !!!
+	
+		Covariance was harmful for the collection when we try to modify it. 
+		But there is no method design to modify collection in IEnumerable<T>
+		interface. So microsoft assume that covariant schould exist. The same is 
+		true for:
+		- IEnumerable<T>
+		- IEnumerator<T>
+		- IReadOnlyCollection<T>
+		- IReadOnlyList<T>
+	
+		When we go into the details of implementation for that interface we 
+		notic IEnumerable<out T> - this 'out' keywords tells the compiler that
+		this interface will only be used to retrieve value of a given type and 
+		therefore it fine to thread the interace as covariant.
+		
+	
+	You can always implicityly cast Derivedp[] to Base[] 
+
+		string[] daysOfWeek = {"Pon", "Wto", "Sro"};
+		object[] objectArray;
+
+		objectArray = daysOfWeek;    
+		
+		
+
+
+
+
+
+
+
+
+

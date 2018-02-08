@@ -1,0 +1,924 @@
+################################################################################
+###																			 ###
+###							Generics										 ###
+###																			 ###
+################################################################################
+
+
+* Generics types allow code reuse with type safety
+	- defer type specification to client
+	- internal algorithms remain the same
+	- allow ass to avoid boxing / unboxing
+	
+	public class MyClass<T>
+	{
+		private T element;
+		
+		//..
+	}
+	
+Create an instance of this clas:
+	
+		MyClass<string> myInstanceString = new MyClass<string>();	
+		
+		MyClass<int> myInstanceInt = new MyClass<int>();
+		
+		This create to instance that are type safe. Internal element have 
+		type defined between the brackets.
+
+		
+Terminology:
+
+	Generic class: 
+
+		public class MyClass<T>
+		...
+	
+		We can also have:
+		* generic interfaces
+		* generic structs
+		* generic delegates
+	<T>  :
+	
+		T - is what we call the type parameter. The name is arbitrary.
+	
+		When we instalce the class we have to provide a type argument
+		
+		var tmp = new MyClass<int>();		- int is a type argument
+	
+Under the hood:
+
+	Every time you create a class with new T arguemtn compiler will create
+	a new class base on the code frome generic class and parameter you provide.
+	It is like copy paste.
+	
+	var b1= new MyClass<string>();
+	var b2= new MyClass<string>();
+	var b3= new MyClass<int>();
+	var b4= new MyClass<object>();
+	
+	b1.GetType() == b2.GetType();		// true
+	b1.GetType() == b3.GetType();		// false
+	b1.GetType() == b4.GetType();		// false
+
+	
+
+
+################################################################################
+
+### Generic class and interfaces
+
+
+	public interface IBuffer<T> : IEnumerable<T>	- all classes that 
+	{												- implements IBuffer<T>
+		bool IsEmpty {get;}							- has to also implement
+		void Write(T value);						  IEnumerable<T>
+		T Read();
+	}
+	
+	public class Buffer<T> : IBuffer<T>     - has to also implemt IEnumerable<T>
+	{												- becouse: 
+		private Queue<T> queue = new Queue<T>();	- IEnumerable<T> : IEnumerable
+													- We has to also implement 
+		public virtual bool IsEmpty {get; set;}		- non generic version
+		
+		public virtual void Write(T value)
+		{
+			...
+		}
+		
+		public virtual T Read()
+			...
+		}
+		// IEnumerable<T> require two GetEnumerator() methods 
+		// Implementation:
+		
+		public IEnumerable<T> GetEnumerator()		- first generic version
+		{
+			// return queue.GetEnumerator();		- simplest way
+			
+			foreach(var item in queue)
+			{
+				yield return item;
+			}
+		}
+		
+		IEnumerable IEnumerable.GetEnumerator()		- second non generic version
+		{											- explicit implementation
+			return GetEnumerator();					- guarantee that the method
+		}											- is accessible only throught
+													- IEnumerable iterface 
+	}												  (not visable in standard way)
+	
+	
+	public class CircuralBuffer<T> : Buffer<T>		- circuralBuffer inharits
+	{												- required methods
+		public bool IsEmpty {get; set;}
+		
+		public overvoid void Write(T value)
+		{
+			...
+		}
+		
+		public overvoid T Read()
+		{
+			...
+		}
+		//..
+	}
+	
+	
+	var circuralBuffer = new CircuralBuffer<double>();
+	var buffer = new Buffer<double>();
+	
+	ProcessBuffer(circuralBuffer);
+	ProcessBuffer(buffer);	
+	
+	private static void ProcessBuffer(IBuffer<double> buffer)
+	{
+		...
+	}
+	
+	
+Everything is worked.Leths try experiment:
+	
+	public class CircuralBuffer<Z> : Buffer<T>		// error !!!
+	...
+	
+	Types names have to match. Otherwise we get a run time error.
+	
+	public class CircuralBuffer<T> : Buffer<T>		// ok !!
+	
+Simplyfied collection:
+	
+	Or lets assume we want to create comples generic type like this:
+	
+	var departments = new SosrtedDictionary<string, SortedSet<Employee>>();
+	
+	departments.Add("Sales, new SortedSet<Employee>(new EmployeeComparer()));
+	departments["Sales"].Add(new Employee { Name = "Yoi" });
+	departments["Sales"].Add(new Employee { Name = "Dani" });
+	departments["Sales"].Add(new Employee { Name = "Anna" });
+	
+	To make the life easy we can create class:
+	
+	public class DepartmentCollection : SosrtedDictionary<string, SortedSet<Employee>>
+	{ 
+		public DepartmentCollection Add(String departmentName, Employee employee)
+		{
+			if(!ContainsKey(departmentName))
+			{
+				Add(departmentName, new SortedSet<Employee>(new EmployeeComparer()));
+			}
+			this[departmentName].Add(employee);
+			return this;										- return itself
+		}
+		// ...
+	}
+		
+	Now we can just create:
+	
+	var departments = new DepartmentCollection();
+	
+	departments.Add("Sales", new Employee { Name = "Yoi" })
+			   .Add("Sales", new Employee { Name = "Dani" })
+			   .Add("Sales", new Employee { Name = "Anna" });
+	
+	departments.Add("Enginiering", new Employee { Name = "Yoi" })
+			   .Add("Enginiering", new Employee { Name = "Alex"" })
+			   .Add("Enginiering", new Employee { Name = "Tom" });
+
+
+
+
+################################################################################
+
+### Generic Method and Delegates
+
+
+Firstlly remember:
+
+	Look at below generic interface:
+
+		public interface IBuffer<T> : IEnumerable<T>
+		{
+			bool IsEmpty { get; }
+			void Write(T value);	
+			IEnumerable<int> AsEunumerableOfInt();				- this two methods
+			IEnumerable<string> AsEunumerableOfString();		- look very similar
+			T Read();
+		}
+
+		IEnumerable<int> AsEnumerableOf<TOutput>();	
+		
+		Or to be even more flexible:
+		
+		IEnumerable<TOutput> AsEnumerableOf<TOutput>();			- but how to implement
+																  method like this?
+																  
+	Now take a lookj at the Buffer<T> : IBuffer<T> class:
+	
+		//...
+		IEnumerable<TOutput> AsEnumerableOf<TOutput>()				
+		{
+			var converter = TypeDescriptor.GetConverter(typeof(T))
+			foreach(var item in queue)
+			{
+				var result = converter.ConvertTo(item, typeof(TOutput));
+				yield return (TOutput)result;
+			}
+		}
+		//...
+	
+	How to use it?
+	
+		var buffer = new Buffer<double>();
+		var asInts = buffer.AsEnumerableOf<int>();		- somtimes c# comiler
+														  can detect right type automaticaly
+														  
+Extension Generic Methods:
+
+	We can create extension method for every type that implement IBuffer<T> 
+	interface. (extension metod for interface):
+
+		public static IEnumerable<TOutput> AsEnumerableOf<T, TOutput>(
+			this IBuffer<T> buffer)				
+		{
+			var converter = TypeDescriptor.GetConverter(typeof(T))
+			foreach(var item in buffer)
+			{
+				TOutput result = (IOutput)converter.ConvertTo(
+					item, typeof(TOutput));
+				yield return result;
+			}
+		}
+	
+	Generic types parameters are a part of the method signature. It means that
+	C# compiler use them to distinct different methods. So:
+	
+		public static IEnumerable<TOutput> AsEnumerableOf<T, TOutput, T3>(
+			this IBuffer<T> buffer)	
+	
+	Above method with three generic type parameters is different the previous
+	one. But when we create another method with signature differs only by 
+	name of the generic parameter compiler raise an error.
+	
+		... <T, TOutput2> ... 	is the same as: ... <T2, TOutput>		// Error!!!
+		
+	Another example:
+	
+		public static void Dump<T>(this IBuffer<T> buffer)
+		{
+			foreach(var item in buffer)
+			{
+				Console.WriteLine(item);
+			}
+		}
+	
+	We can use it like this:
+
+		IBuffer buffer = new Buffer<double>();
+		
+		buffer.Dump<double>();							// as usual we can pass generic type parameter
+		buffer.Dump();									// or we allow the comiler to figuer it out.
+	
+		buffer.Dump<int>();								// Error!!!
+	
+	How C# compiler determinated wrong type in last example??
+		
+		public static void Dump<T>(this IBuffer<T> buffer) - from declaration
+		
+		we know that T parameter must be the same type for IBuffer and the 
+		method we use. C# compiler is preaty smat and is able to determinate it.
+		But in first example we use:
+		
+		..IEnumerable<TOutput> AsEnumerableOf<T, TOutput>(this IBuffer<T> buffer)	
+	
+		As we see abouve roule apply to T parameter. We get exactyle the same
+		situation but: TOutput parameter comes out of nowere so it must be
+		explicitle declared when the method is used:
+		
+		IBuffer buffer = new Buffer<double>();
+		
+		var asInt = buffer.AsEnumerableOf<double, int>();
+	
+
+Generic delegates:
+
+	It is variable that can point to other methods with the same signature.
+	
+		public delegate void Printer<T>(T data);
+		
+		public static void Dump<T>(this IBuffer<T> buffer, Printer<T> print)
+		{
+			foreach(var item in buffer)
+			{
+				print(item);
+			}
+		}
+	
+		///
+		static void ConsoleWrite<T>(T data)
+		{
+			Console.WriteLine(data);
+		}
+		///
+		IBuffer buffer = new Buffer<double>();
+
+		buffer.Dump(ConsoleWrite);			// Printer<double> printer = new Printer<double>(ConsoleWrite)
+	
+	Thanks to delegates we easly avoid boxing. In C# delegates are so usefull
+	that we have several delegate types that are already build-in in .NET.
+	
+	Three general types delegate that are used in every day work:
+	- Func
+	- Action
+	- Predicate
+	
+	
+	Action Delegate - allows us to point to a methods but the method have to 
+					  always return void. (no retur value). It can take from 0
+					  to 16 parameters (sufficent).  
+	
+		Action<double> print = ConsoleWrite;
+		print(2.0);								// it works
+		
+		IBuffer buffer = new Buffer<double>();	// to use it with our type we have
+		buffer.Dump(print);						// to make some modification
+		
+		Currently our declaration looks like this:
+		
+		public static void Dump<T>(this IBuffer<T> buffer, Printer<T> print)
+	
+		Impreoved:
+		
+		public static void Dump<T>(this IBuffer<T> buffer, Action<T> print)
+	
+		
+		We can assign methods to a delegate like above. We can also use 
+		announymous methods:
+		
+		Action<double> print = delegate(double data) 
+		{
+			Console.WriteLine(data);
+		};
+	
+		
+		We can use lambda expression that is the easiest way:
+		
+		Action<double> print = d => Console.WriteLine(d);
+	
+	
+	Func delegate - it very similar to action. It can take from 1 to 16 parameters
+					From 1 becouse there is always one generic parameter that
+					determinate type of returned value (func always has to return
+					some value). Last generic type parameter is returned type.
+					
+		Func<double> fun				// function that returns duble
+		Func<double, double> fun		// function that takes a double and return double
+		Func<double, string> fun		// function that takes a double and return string
+		
+		Func<double, double, double> add = (x,y) => x * y;
+		
+
+	Predicate     - it always return a boolen value. 
+	
+		Predicate<double> isLessThen	// takes a double and return a boolen
+					
+		Predicate<double> isLessThen = d => d < 10;  // return bool  true / false 
+
+	
+	Example:
+	
+		Action<bool> print = d => ConsoleWrite(d);
+		Func<double, double> square = d => d * d;
+		Func<double, double, double> add = (x,y) => x + y;
+		Predicate<double> isLessThenTen = d => d < 10;
+		
+		print(isLessThenTen(square(add(3,5))));
+		
+		
+	Converter delegate - this delegate has always two parameter in TInput and
+						 out TOutput. It is desinged for conversion input type
+						 into output type. 
+						 
+		Converter<double, string> converter = d => d.ToStrping();
+					
+		
+		So using this method we can design one of our previous extended method in 
+		completaly different way. Lets take a look at the old implementation:
+					
+			public static IEnumerable<TOutput> AsEnumerableOf<T, TOutput>(
+				this IBuffer<T> buffer)				
+			{
+				var converter = TypeDescriptor.GetConverter(typeof(T))
+				foreach(var item in buffer)
+				{
+					TOutput result = (IOutput)converter.ConvertTo(
+						item, typeof(TOutput));
+					yield return result;
+				}
+			}
+					
+		When we try to use this methods in following way:
+
+			IBuffer<double> = new Buffer<double>();
+			var asDate = buffer.AsEnumerableOf<double, DataTime>();		// Error!!!!
+			
+		We gen an error. Becouse our methods can not figuer out how to convet
+		double to DataTime type. In fact this method works only for basic types.
+		How we can improve it with new delegete? We can pass conversion method
+		as a parameter thanks to conversion delegate.
+		
+			public static IEnumerable<TOutput> Map<T, TOutput>(
+				this IBuffer<T> buffer, Converter<T, TOutput converter)
+			{
+				foreach(var item in buffer)
+				{
+					IOutput result = converter(item);
+					yield return result;
+				}
+			}
+		
+			or we can simplify the methos further by using LINQ Select operator:
+			
+			public static IEnumerable<TOutput> Map<T, TOutput>(
+				this IBuffer<T> buffer, Converter<T, TOutput converter)
+			{
+				return buffer.Select(i => converter(i));		// iterate over all and
+			}													// return result for converter 
+		
+		
+		And ready to work example:
+		
+			IBuffer<double> = new Buffer<double>();
+			
+			Converter<double, DataTime> converter = d => new DataTime(2010,1,1).AddDays(d);
+			
+			var asDates = buffer.Map(converter);			// nor required for explicit
+															// generic arguemtns specification
+			C# compiler is able to determinet necessary types from converter declaration
+			We can also use it like this:
+			
+			var asDates = buffer.Map(d => new DataTime(2010,1,1).AddDays(d));
+			
+			C# is ablo to handle even such a complicated declaration. No explicit types
+			declaration required! Input d comes from Buffer declaration. Returning 
+			value is new DateTime - so both types are known.
+		
+	
+Events and Generics:
+
+	Lets assume we have following data structure:
+	
+		class CircularBuffer<T> : Buffer<T>		// Buffer<T> is previously defined base class
+		{
+			int capacity;
+			public CircularBuffer(int capacity = 10)
+			{
+				this.capacity = capacity;
+			}
+		
+			public ovveride void Write(T value)
+			{
+				base.Write(value);
+				if(queue.Count > capacity)
+				{
+					queue.Dequeue();
+				}
+			}
+			
+			public bool IsFull { get {return queue.Count == capacity}}
+		}
+		
+	We want to know if the item was dicarded and when the new item is forcing
+	the injection. Best way to do that is raise the event inside circuralBuffer
+	whenever it reach appriopriate capacity.
+	
+			...
+			public event EventHandler<EventArgs> ItemDiscarded;
+	
+			public bool IsFull { get {return queue.Count == capacity}}
+			...
+	
+		var buffer = new CircularBuffer<double>(capacity:3);
+		buffer.ItemDiscarded += buffer_ItemDiscarded;
+		
+		public void buffer_ItemDiscarded(object sender, EventArgs e)
+		{ 
+			...
+		}
+	
+	We also need some custom EventArgs class to pass required information to
+	our event. Lets create one:
+		
+		public class ItemDiscardedEventArgs<T> : EventArgs
+		{
+			public ItemDiscardedEventArgs(T  itemDiscarded, T newItem)
+			{
+				this.ItemDiscarded = itemDiscarded;
+				this.NewItem = newItem;
+			}
+		
+			public T ItemDiscarded { get; set; }
+			public T NewItem { get; set; }
+		}
+	
+	Now we can change the type of EventHandler and modify method definition. We
+	can also add code responsible for resing our event.
+	
+		
+		class CircularBuffer<T> : Buffer<T>		// Buffer<T> is previously defined base class
+		{
+			int capacity;
+			public CircularBuffer(int capacity = 10)
+			{
+				this.capacity = capacity;
+			}
+		
+			public ovveride void Write(T value)
+			{
+				base.Write(value);
+				if(queue.Count > capacity)
+				{
+					var discard = queue.Dequeue();
+					OnItemDiscarded(discard, value);
+				}
+			}
+			
+			public void OnItemDiscarded(T discard, T value)
+			{
+				if(ItemDiscarded != null)
+				{
+					var args = new ItemDiscardedEventArgs<T>(dicarded, value);
+					ItemDiscarded(this, args);
+				}
+			}
+			
+			public event EventHandler<ItemDiscardedEventArgs<T>> ItemDiscarded;
+			public bool IsFull { get {return queue.Count == capacity}}
+		}
+		...
+		var buffer = new CircularBuffer<double>(capacity:3);
+		buffer.ItemDiscarded += ItemDiscarded;
+		
+		public void ItemDiscarded(object sender, ItemDiscardedEventArgs<double> e)
+		{ 
+			Console.WriteLine("Buffer full. Discarding {0} New item {1}",
+				e.ItemDiscarded, e.NewItem);
+		}
+	
+	
+	
+	
+################################################################################
+
+### Constraints, Covariance and Contravariance
+
+
+	When whe just define T parameter without any constraints the compiler assume
+	that all what can be done with this type is what can be done with object type.
+	
+	So we can not interact with object that is why constraints are usefull.
+	
+	Constraints:
+	
+		* Force a type parameter to habe certain characteristics
+			- Be a reference type or balue type
+			- Implement interface
+			- Derive from a base class
+			- Have a defualt constructor
+			- Be (or derive from) another generic type parameter
+			  ex: IBuffer<T> where T: class, IItem, new()
+			  
+	For learnign purpose lets create following structure:
+	
+		public class Person
+		{
+			public strng Name {get; set; }
+		}
+		
+		public class Employee : Person 
+		{
+			public int Id { get; set; }
+			public virutal void DoWork() { Console.WriteLine("Do real work");}
+		}
+
+		public class Manager : Employee
+		{
+			public override void DoWork() { Console.WriteLine("Create a meeting");}
+		}
+		
+		
+		Class constraints:
+		
+			If we specify some gneeric class or methods like this (without any
+			constraints) the T type can be enything:
+			
+			GenericRepostiory<T> 
+			{
+				...
+				public T FindById(int id)
+				{
+					T entity = null;			// COMPILER ERROR!!!
+					
+					return entity;
+				}
+			}
+		
+			This is not allowed becouse T can be value type ex: int . As you
+			know int can not be nullable in standard form. So there is an 
+			error in another example. Temporar solution is to use:
+			
+			T entity = default(T);			// 0 for int, null for reference type
+			
+			It will initialize the value to default state (depending on the type).
+			
+			If we define it with class constraint that restrict T type to be 
+			only a reference value (all reference value are nullable) it is 
+			ok to assign null to the reference. 
+		
+			GenericRepostiory<T> where T : class
+			{
+				...
+				public T FindById(int id)
+				{
+					T entity = null;			// OK!!!!
+					
+					return entity;
+				}
+			}
+			
+			IMPORTENT!!: class constraint has to be first among the constraints
+			
+		Struct constraint:
+		
+			Restrict the T type to be only a value type. 
+		
+		Interface constraints:
+		
+			You can use as meny interfaces as you like ex:
+			
+			GenericRepostiory<T> where T : class, IEntity, IDisposable
+			{
+				...
+			}
+		
+			This constraints give us an access to the methods that all of the
+			mentioned interfaces contains. So the functionality of the T type
+			is extended. Of course T mus implement all of thouse interfaces.
+
+		Base class constraint:
+		
+			This constraint defines that T type must derive from particualr type.
+			Compiler is smart enought to determinate wheter the T is value type
+			or reference type base on the name of the base type.
+			
+			GenericRepostiory<T> where T : Person, IEntity, IDisposable
+			{
+				...
+			}
+			
+			The compiler know that Person is a class. So there is no need to 
+			duplicate constraints. Again importent thing is to put the 
+			base class constraint before any other constraints. It is also
+			posible to declare something like this:
+			
+			GenericRepostiory<T, T2> where T : T2, IEntity, IDisposable
+			{
+				...
+			}
+			
+			It means that T must derived from T2. 
+			
+		New() constraint:
+		
+			This constraint allow us to create new object. It always has to 
+			be the last constraint (becouse we can create reference and 
+			value objct using new() operator). In nutshell, new() force T type
+			to have default constructor.
+
+			GenericRepostiory<T> where T : class, IEntity, new()
+			{
+				...
+				public T FindById(int id)
+				{
+					T entity = new T();
+					
+					return entity;
+				}
+			}
+			
+		Constraints with multiple T types:
+		
+			We can declare constraints for different T types. We do that by
+			adding another where declaration.
+		
+			GenericRepostiory<T, T2> where T  : class, IEntity
+									 where T2 : class,  
+			{
+				...
+				public T FindById(int id)
+				{
+					T entity = new T();
+					
+					return entity;
+				}
+			}
+	
+	
+	Covariance:
+	
+		out - is a generic modifier it makes a parameter covariance.
+			  ex: IEnumerable<out T> : IEnumerable . The oposite to this
+			  is invariant generic type parameter (no generic modifier)
+			  Generic type used as an argument it the type we have to use.
+			  example:
+			  
+			  we habe two class: 
+			
+				public class Person
+				....
+				public class Employee : Person 
+				....
+			
+			  we also have:
+			
+				IRepository<Person> ....
+				IRepository<Employee> ...
+				
+			  we have a method:
+			  
+				public static void ShowPeople(IRepository<Employee> employeeRepository)
+				{
+					var employee = employeeRepository.FindAll();
+					...
+				}
+				
+				ShowPeople(new EmployeeRepository);  // OK
+				
+				Above method is totaly ok but we want to reuse them multiple
+				times. According to object oriented programing it schould be 
+				possible to make sth like this:
+				
+				public static void ShowPeople(IRepository<Person> employeeRepository)
+				{
+					var employee = employeeRepository.FindAll();
+					...
+				}
+				
+				ShowPeople(new EmployeeRepository);  // ERROR!!!!!
+				
+				Compiler riports conversion error:
+				cannot convert: IRepository<Employee> to IRepository<Person>)
+				
+				But we can do sth like this:
+				
+				IEnumerable<Employee> tmp = employeeRepository.FindAll(); // OK!!
+				IEnumerable<Person> tmp = employeeRepository.FindAll();   // OK!!
+				
+			Lets make our method works:
+			
+				Covariance 'out' only works for delegats and interfaces. 
+				But if I try just add our 'out' modifier to IRepository interfece
+				I get compilation error. This modifier is only support when we
+				have methods that return coviarant T paramater (out T). So we 
+				can not add this marameter when we have some methods that takes
+				the parameter of type T like: add(T entity), delete(T entity).
+				It works this way for security reason. Becouse if that would be
+				done we would be able to pass any type that derive from base class
+				as a parameter. It will give us lots of errors and couse many
+				missunderstendings. 
+				
+				To sumarize: 'out T' can be use in ReadOnly types. 
+				
+				To make our method work we do the following:
+				
+					create another interface:
+					
+					IReadonlyRepository<out T> : IDisposable
+					{
+						T FindById(int id);
+						IQueryable<T> FindAll();
+					}
+				
+				Implement new type in our repository:
+				
+					IRepository<Person> : IReadonlyRepository<T>....
+					IRepository<Employee> : IReadonlyRepository<T>...
+				
+				Our method:
+					
+					public static void ShowPeople(
+						IReadonlyRepository<Person> employeeRepository)
+					{
+						var employee = employeeRepository.FindAll();
+						...
+					}
+				
+					ShowPeople(new EmployeeRepository);  // OK!!!!
+				
+				This method is only possible from C# 4.
+				
+	Contravariance:
+		
+		It is similar to covariance but it works in opposite direction. 
+		
+		Lets again assume we have following class:
+		 			
+			public class Person
+			....
+			public class Employee : Person 
+			....
+			public class Manager : Employee
+			....
+			
+			IRepository<Person> ....
+			IRepository<Employee> ....
+			IRepository<Employee> ....
+			
+		We want to do sth like this:
+				
+			public static void Add(IRepository<Employee> employeeRepository)
+			{
+				employeeRepository.Add(new Manager {...});
+				...
+			}
+			
+			AddManagers(new employeeRepository);  // OK!!!
+
+		Becouse Manager derive from employee it is not a problem to pass
+		Manager when an employee is expected.(Mangaer have all required data 
+		for employee object)
+		
+			public static void Add(IRepository<Manager> employeeRepository)
+			{
+				employeeRepository.Add(new Manager {...});
+				...
+			}
+			
+			AddManagers(new employeeRepository);	// ERROR!!!
+			
+		C# can not make the conversion. We pass employee repo but Manager repo
+		is expected. Teoretically it schoud be possible. Error is rised becouse
+		IRepository<T> is invariant and if we have IRrepository<T> we have to 
+		treat it as IRepository<T>.
+
+		Contravariance use <in T> modifier. It works simpla to <out T> .
+		
+		<out T> - is used for output methods
+		<in T>  - is used for input method
+		
+		Why we get an error whan we call method in our example. If I want to
+		find sth in IRepository<Manager> but it is realy IRepository<Employee>
+		it will give me back employee object when I expect manager. I would be
+		a problem. 
+		
+		We can not have method that return T us a parameter. There is a way to 
+		do this. We need to define another interface:
+		
+			public interface IWriteOnlyRepository<in T> : IDisposable
+			{
+				void Add(T newEntity);
+				void Delete(T entity);
+				int Comit();
+			}
+		
+			public interfce IRepository<T> : IReadonlyRepository<T>, IWriteOnlyRepository<T>
+			{
+			}
+		
+		So now our methods can look like this:
+		
+			public static void ShowPeople(
+				IReadonlyRepository<Person> employeeRepository)
+			{
+				var employee = employeeRepository.FindAll();
+				...
+			}
+				
+			ShowPeople(new EmployeeRepository);  // OK!!!!
+		
+			public static void Add(IWriteOnlyRepository<Manager> employeeRepository)
+			{
+				employeeRepository.Add(new Manager {...});
+				...
+			}
+			
+			AddManagers(new employeeRepository); // OK!!!
+		
+		Sumarization:
+			
+			Iam using Convariance to take a type uses Employee and treat as
+			if it uses person. (only reading)
+		 
+		    IReadOnly<out T>  ==> IReadOnly<Employee>  ==>  IReadOnly<Person>
+			
+			Iam usign Contravariance to treat IRepository<Employee> as 
+			IRepository<Managaer>. Methods that require me to pass an employee
+			schoud be able to take manager objects. (only writing).
+			
+			IWriteOnly<in T>  ==>  IWriteOnly<Employee> ==> IWriteOnly<Managaer>
+			
+			
+	

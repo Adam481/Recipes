@@ -43,7 +43,10 @@
   <ItemGroup>
     <Compile Include="AdoNet.cs" />
     <Compile Include="CustomConfigurationSection.cs" />
+    <Compile Include="LinqToObject.cs" />
+    <Compile Include="LinqToXml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Regex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,0 +1,393 @@
+Events are just information comming to one or multiple subscribers.
+(from event sender to event listener). 
+
+Delegates are like the glue between this two parts. 
+(allow sender and subscribers to comminicate)
+	* Specialized class often called a "Function Pointer"
+	* The glue/pipeline between an event and an event handler
+	* Based on a MulticastDelegate base class
+
+	
+Event handler
+	* responsible for receiving and processing data from a delegate
+	* normally receives two parameters
+		- Sender ( object )
+		- EventArgs ( yuo can define customize version of eventArgs)
+	* EventArgs responsible for encapsulating event data.
+	
+
+### Creating custom delegates
+
+
+Dlegate base class:
+* Method				- define method where the data schould go
+* Target 				- object that have that method
+* GetInvocationList()   - take a look at MulticastDelegate class
+						  every delegate yuu create once is compiled 
+MulticastDelegate:		  will inharite from this class. It is a way
+						  to hold multiple deleages. (one message sending
+						  accrose multiple piplines)
+Custom Delegates		- (inharite from abocve class)				
+
+You can not derive from thouse classes directly. You must yuse delegate
+keyword. When you use it, base on signature you provide compiler
+automaticaly create class that inharite from MulticastDelegate.
+
+Lets imagine that you have multiple piplines. Every pipline goes to 
+different methods. MulticastDelegate is a array of multiple pipelines.
+
+
+# Definition of delegate:	(class that inharite from MulticastDelegate will 
+							be creted becaouse you use delegate keyword)
+
+public delegate void WorkPerformedHandler(int hours, WorkType workType);
+
+
+# Delegate instance			(in constructor we pass the handler that schould be
+							called when the delegate is invoke)
+
+WorkPerformedHandler del1 = new WorkPerformedHandler(WorkPerformed1);
+
+
+# Hendler                   (expect the same arg type: Names don't matter)
+
+
+static void WorkPerformed1(int hours, WorkType workType)
+{
+	Console.WriteLine("Workperformed1 called");
+}
+static void WorkPerformed2()int hours, WorkType workType)
+{
+	Console.WriteLine("Workperformed2 called");
+}
+
+
+# Call the delegate 		(it is exactly like invoke a method)
+
+
+del1(5, WorkType.Golf);
+
+
+# In above examle we have one delegate (one pipeline).
+
+
+WorkPerformedHandler del1 = new WorkPerformedHandler(WorkPerformed1);
+WorkPerformedHandler del2 = new WorkPerformedHandler(WorkPerformed2);
+
+
+# If we want to call two things at the same time we can do it like this:
+
+
+del1 += del2;
+del1(5, WorkType.GoToMeetings);			- both method will be called
+										  (one call notify multiple handlers)
+
+# Return value
+
+
+Rules are simple: if we have more than one delegate in the invocation
+list only last delegate is able to return a value.						  
+										  
+
+### Defining an Event
+
+										  
+# Events can be defined in a class using the event keyword:
+
+
+public event WorkPerformedHandler WorkPerformed;
+
+
+# Events can be defined using add/remove accessors:   (this give you more 
+											control on how listeners are added 
+											to invocation list)
+
+private WorkPerformedHandler _WorkPerformedHandler;
+public event WorkPerformedHandler WorkPerformed
+{
+	[MethodImpl](MethodImplOptions.Synchronized)]
+	add
+	{
+		_WorkPerformedHandler = (WorkPerformedHandler)Delegate.Combine(
+			_WorkPerformedHandler, value);
+	}
+	[MethodImpl(MethodImplOptions.Synchronized)]
+	remove
+	{
+		_WorkPerformedHandler = (WorkPerformedHandler)Delegate.Remove(
+			_WorkPerformedHandler, value);
+	}
+}
+
+
+# Raising Events
+
+
+Event are raised by calling the vent like a method:
+
+if (WorkPerformed != null)
+{
+	WorkPerformed(8, WorkType.GenerateReports);
+}
+
+
+Another option is to access the event's de;egate and invoke it directly:
+
+WorkPerformedHandler del = WorkPerformed as WorkPerformedHandler;
+if (del != null)
+{
+	del(8, WorkType.GenerateReports);
+}
+
+
+As you se you invoke the event just like a method (event are delegates).
+Rememver to check if an event have something on the invocation list othervise
+you get exception during raising.
+
+WorkPerformed as WorkPerformedHandler  - cust the event as a delegate.
+										 (second tech. of doing this)
+
+										 
+### Exposing and Raising Events
+
+										 
+public delegate int WorkPerformedHandler(int hours, WorkType workType);
+
+public class Woker
+{
+	// events definitions
+	public event WorkPerformedHandler WorkPerformed;
+	public event EventHandler WorkCompleted; //build-in .NET delegate
+
+	public virtual void DoWork(int hours, WorkType workType)
+	{
+		// Do work hare and notify customer that work has been performed
+		OnWorkPerformed(hours, workType);
+	}
+
+	protected virtual void OnWorkPerformed(int hours, WorkType workType)
+	{
+		WorkPerformedHandler del = WorkPerformed as WorkPerformedHandler;
+		if (del != null) // Listeners are attached
+		{
+			del(hours, workType);   // raise event
+		}
+	}
+}										 
+										 
+
+### Creating a Custom EventArgs Class
+
+
+The EventArgs class is used in the signature of many delegates	and event 
+handlers:
+
+
+public void button_Click(object sender, EventArgs e)
+{
+	// Handle button click
+} 
+							
+
+When custom data needs to be passed the EventArgs class can be extended.
+Best way to to that is to define new class that derive from System.EventArgs.
+
+public class WorkPerformedEventArgs : System.EventArgs
+{
+	public int Hours {get; set;}
+	public WorkType WorkType {get; set;}
+}
+
+
+# To use a custom EventArgs class, the delegate must reference the class in 
+														its signature:
+														
+public delegate void WorkPerformedHandler(object sender, 
+												WorkPerformedEventArgs e);
+
+
+### Using EventHandler<T>
+
+
+.NET includes a generic EventHandler<T> class that can be used instead of custom delegate:
+	(Behind the scene it does exactly the same thing as above.)
+
+public event EventHandler<WorkPerformedEventArgs> WorkPerformed;
+
+
+### Instantiating Delegates and Handling Events
+
+
+The delegate signature must be mimicked by a handler method:
+
+public delegate void WorkPerformedHandler(object sender, 
+												WorkPerformedEventArgs e);
+												
+public void Manager_WorkPerformed(object sender, WorkPerformedEventArgs e)
+{
+	...
+}
+
+
+# Defining and attaching event handlers
+
+The += operator is used to attach an event to an event handler
+
+var worker = new Worker();
+worker.WorkPerformed += 
+	new EventHandler<WorkPerformedEventArgs>(work_WorkPerformed);
+
+void worker_Workperformed(object sender, WorkPerformedEventArgs e)
+{
+	Console.WriteLine(e.Hours.ToString());
+}
+	
+
+### Delegate inference
+
+
+The += operator is used to attach an event to an event handler
+
+var worker = new Worker();
+worker.WorkPerformed += work_WorkPerformed;   // compilerw will 'infer' 
+											  // the delegate
+
+void worker_Workperformed(object sender, WorkPerformedEventArgs e)
+{
+	Console.WriteLine(e.Hours.ToString());
+}
+
+
+### Using Anonymous Mehtods (methods that does not have a name)
+
+
+Anonymous methods allow event handler code to be hooked directly to an event.
+Anonymous methods are defined using the delegate keyword:
+
+var worker = new Worker();
+worker.WorkPerformed += delegate(object sender, WorkPerformedEventArgs e) 
+						{
+							Console.WriteLine(e.Hours.ToString());
+						}; //End of anonymous method
+						
+Above method can be used only once (you can not reused it again later on).				
+It is very usefull when your event failed and you need to debug it quickly.				
+
+
+### Lambdas and Delegates
+
+
+Anonymous Methods:
+
+SubmitButton.Click += delegate(object sender, EventArgs e)
+{
+	MessageBox.Show("Button Clicked");
+};
+
+
+Lambdas Expression:
+
+SubmitButton.Click += (s,e) => MessageBox.Show("Button Clicked");
+
+
+(s,e) - inline method parameters (compiler take a look at the event ..Click 
+								  specificaly the delegate behind the event
+								  and base on that determinate parameters type)
+=>	  - operator that provides a way to separate parameters and methods body
+		(it does nothing - apart from separating things)
+
+
+Assigning a Lambda to a Delegate:
+
+Lambda expressions can be assigned to any delegate
+
+delegate int AddDelegate(int a, int b);
+
+static void Main(string[], args)
+{
+	AddDelegate ad = (a,b) => a + b;	// names do not need to match
+	int result = ad(1,1);				// result = 2
+}
+
+
+Delegates that don't accept any paramaters can be handled using lambdas:
+
+delegate bool LogDelegate();
+
+static void Main(string[], args)
+{
+	LogDelegate ld = () =>
+	{
+		UpdateDatabase();
+		WriteToEventLog();
+		return true;
+	};
+	bool status = ld();
+}
+
+
+# Delegates in .NET
+
+The .NET framework provides several diffrent delegates that provide 
+flexible options:  
+
+Action<T>  			- accepts a single parameter and returns no value
+Func<T, TResult> 	- accepts a single parameter and return a value of
+					  type TResult
+					  (IN fact you can provide as meny param.. as you want)
+					  
+Using Action<T>  :
+
+public static void Main(string[] args)
+{
+	Action<string> messageTarget;
+	if (args.Lenght > 1) 
+		messageTarget = ShowWindowsMessage;
+	else 
+		messageTarget = Console.WriteLine;
+	
+	messageTarget("Invoking Action");	
+}
+
+private static void ShowWindowsMessage(string message)
+{
+	MessageBox.Show(message);
+}
+
+
+Using Func<T,TResult>  :
+
+public static void Main(string[] args)
+{
+	Func<string, bool> logFunc;
+	if (args[0] == "EventLog") 
+		logFunc = LogToEventLog;
+	else
+		logFunc = LogToFile;
+	
+	bool status = logFunc("Log Message");
+}
+
+private static bool LogToEventLog(string message) { /* log */ };
+private static bool LogToFile(string message) { /* log */ };
+
+
+skonczylem!! na Using Func - teraz Demo: Using Lamgdas and Func ...
+
+
+ILSpy - ciekawostka
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
