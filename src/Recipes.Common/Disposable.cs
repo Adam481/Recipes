@@ -8,6 +8,7 @@ namespace Recipes.Common
 
         protected abstract void DisposeAction();
 
+
         protected void Dispose(bool disposing)
         {
             if (!disposed)
@@ -19,6 +20,7 @@ namespace Recipes.Common
             }
             disposed = true;
         }
+
 
         public void Dispose()
         {
