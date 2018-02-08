@@ -1,0 +1,200 @@
+#################################################################################
+#
+### GIT 
+
+
+## Git is like a onion ( it has layers )
+
+
+# Lev 1. - Persistent Map
+
+
+Git has Values and Keys ( any sequence of bytes is a values -> SHA1 hash) Every object 
+is in Git has its own SHA1 (SHA1 are unique)
+
+echo "Apple Pie" | git hash-object --stdin	    - generate and return SHA1 hash 
+echo "Apple Pie" | git hash-object --stdin -w   - generate a hash and add it to the repository
+
+git init 					- create a new repository ( .git catalog)
+
+./git/objects/12				- two egzample digits are the begining of the SHA1 hash 
+git cat-file 23991897e13e47ed0adb91a0082c31c82fe0cbe5 -t    - show the object
+git cat-file 23991897e13e47ed0adb91a0082c31c82fe0cbe5 -p    - unzip the object and show
+                                                              the content (Apple Pie)
+
+
+# Lev 2. - a Stupid Content Tracker
+
+
+git status 		                  - show the working tree status
+git add file	      	          - add files as a set of files for commitment
+git add folder
+
+git commit -m "First commit"    - (now the git status is clean)
+git log			                    - look at existing commit
+
+./git/object/...	              - we have two type of object
+blob			                      - content of the file storing in git 
+tree			                      - directory storing in git
+
+If two file looks exactly the same git will not create two separate object. Insteed it
+will use file that already exist in the database. 
+
+Versioning:
+
+Edit the some file:
+git status    		                - show that somethig was changed
+git add ...
+git commit -m "Second commit"     - create second commit
+git log			                      - show us the second commit (this commit has a parent 
+                                    we can see it using cat-file)
+git count-objects 	              - allow as to count all object in the database 
+
+After second commit git create new SHA1 only for object that change. Git create a new tree
+(becouse the content of the whole repo has been change). Git uses old hash for object that
+heve not been changed.
+
+Tags:
+It is like a label for the current stage of the project. We have two type of tags.
+Regular and unnotated tags.
+
+Unnotated tags - comes with the message
+
+git tag -a mytag -m "I love cheese cake"	- craete a new annotated tag is object and
+                                            that will be stored in database
+git cat-file -p mytag				              - we can use tag hash or tag name
+
+Tag is a siple label attached to an object
+
+Summarize:		  - in git db we have
+- Bloobs 		    - arbitrary content
+- Trees   		  - equivalent of direcotries
+- Commits		
+- Annotated Tags
+
+Git is like a file system it contains equivalent of files and directories some of them are
+like links. It have a commits that create versioning - so that it is versioning file
+system.
+
+
+# Lev 3.  a Revision Control System
+
+
+Branches:
+Git create a master brache when we do our first commit. ( master is default branch ).
+Branch file contain a hash - the sema as last commit. It is nothing beyond a simple
+reference that point to a commit.
+
+git branch		          - list existing branches. Current branch is mark by ' * '
+./git/refs/heads	      - place where git store branches
+./git/HEAD		          - file that points to current branch. it contain reference to
+                          branch from above path
+git branch name		      - create a new branch. 
+git checkout name	      - change the current branche. Now head is point to the object
+                          'name'. At the same momennt git replace the files and folders in
+                          our working directory with the files and folders from the commit
+                          that is pointed by 'name' branch.
+                          
+Detached head:
+
+git checkout 12343123   - it is possigle to move our head to specific commit instead of 
+                          branch. (git branch   -command will confirm this). This 
+                          situation is called deatached head (error will be sygnalized)
+                          It will move our head ahead.
+git checkout master     - now we move back to our branch. After this command no current
+                          reference to the object exist so object can be garbage collected
+git branch nazwa        - if our head poin to commit, we can create a branch. After that                          new branch points to the previos commit. (this is our new ref)
+
+
+
+After creating new branch it points to the same commit as existing branch. Lets asume that
+some objects has been modified and new commit has been added. After that happend, Our
+current commit move forward to new commit. The old branch still point to the same commit
+as previously. 
+
+Lets change the branch and modify some files. 
+
+Merge:
+
+We can try to combine our two version using merge comand. It can couse a conflict. The
+whole of merging is It stores the history of our commit in exactly the same format as they
+were created. (Merges preserve history)
+
+git merge name2			          - changes may be in conflict. We need to solve it manualy.
+vim file/with/conflict  	    - edit file using vim manually
+git add filewith/conflict	    - it tels git that the conflict has been solved
+git commit			              - git knows that we are in the middle of the merge and
+                                create suitable message quit from editors is a aprove for
+                                new commit. Sucha a commit has two parents.
+                                
+If we have the merge and this is our last commit where all of conflict are solved, we can
+use:
+
+git checkout name2 		        - chenage current branche
+git marge name			          - merge with the previus brachne ( we have such a commit )
+                                this only move head forward to the same commit again. It
+                                is called (fast-forward) 
+
+References between commits are used to truck history all the odher refereces are used to
+truck content.
+
+
+Rebasing:
+
+Changing the pase of the branch. Operation move all commit from one branch to the to of
+new branch. Rebase history looks very simple. (is nice to loockup - history is not real)
+
+git rebase master         - master get all the commits from current branch
+
+When you repase git gets copy of the commit and create new commits with mostly the same
+data (exactply the same except for their paren). Git moves the copy to the current branch
+and attaches it at the top of master branch. Old copies becomes anreachable. (they will
+be delited by garbage-collects)
+
+
+Tags:
+
+We have two types of tags. Unnotated tags (desc aboce), the second one have no name so
+they are called nonannotated tags or leightweight tags
+
+git tag                     - list tags
+git tag -a tag_name         - 
+
+
+
+Lev 4. 
+
+
+
+
+
+git reset --hard <commidId> && git clean -f     -move to previous commit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

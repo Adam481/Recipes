@@ -265,6 +265,28 @@ namespace Recipes.Common.DotNetFramework
                 Console.WriteLine(item);
             }
         }
+
+
+        private static void SplitToEquelGroups()
+        {
+            var persons = Person.GetPersons();
+
+            persons.ForEach(p => Console.WriteLine($"{p.Id} {p.Name} {p.Surname}"));
+            
+            int groupCount = 3;
+            int groupSize = persons.Count / groupCount;
+
+
+            Dictionary<int, List<Person>> selected = persons
+                .Select((person, index) => new { person, index })
+                .GroupBy(o => o.index / groupSize)
+                .ToDictionary(o => o.Key, o => o.Select(x => x.person).ToList());
+            
+            selected.Keys.ToList()
+                .ForEach(key => selected[key]
+                    .ForEach(v => Console.WriteLine($"{key} {v.Id} {v.Name} {v.Surname}")));
+
+        }
     }
 
 
@@ -285,5 +307,28 @@ namespace Recipes.Common.DotNetFramework
     {
         public string Author { get; set; }
         public string Name { get; set; }
+    }
+
+    class Person
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+
+        public static List<Person> GetPersons()
+        {
+            return new List<Person>
+            {
+                new Person { Id = 1, Name = "Adam", Surname = "Kowalski" },
+                new Person { Id = 2, Name = "Paweł", Surname = "Maliszewski" },
+                new Person { Id = 3, Name = "Stasiek", Surname = "Nowak" },
+                new Person { Id = 4, Name = "Jakub", Surname = "Wisniewski" },
+                new Person { Id = 5, Name = "Adam", Surname = "Malinowski" },
+                new Person { Id = 6, Name = "Kamil", Surname = "Kraszewski" },
+                new Person { Id = 7, Name = "Nikodem", Surname = "Poziomkowski" },
+                new Person { Id = 8, Name = "Adrian", Surname = "Stefaniuk" },
+                new Person { Id = 9, Name = "Karol", Surname = "Kodorski" }
+            };
+        }
     }
 }
