@@ -88,6 +88,7 @@ namespace Recipes.Common.DotNetFramework
             // 1. overriding Equles method and hash code.
             // 2. override Distinct.
             // 3. Project a book in a new anonymous type;
+
             var query2 = books
                 .Select(b => new { b.Name, b.Author })
                 .Distinct();
@@ -191,8 +192,6 @@ namespace Recipes.Common.DotNetFramework
             // * Trigger by an into clause in query syntax
             // * Use SelectMany to flatten (additional form clause)
 
-
-
             //    var query = employees.Join(departments,     // inner squence
             //                          e => e.DepartmentID,  // outer key selector
             //                          d => d.ID.            // inner key selector
@@ -229,26 +228,32 @@ namespace Recipes.Common.DotNetFramework
             ShowAll(query.Select(n => n.EmployeeName + " " + n.DepartmentName), "\nJoin result\n");
 
             // Inner Join
-            var query2 = departments.Join(employees,
-                                     d => d.ID,
-                                     e => e.DepartmentID,
-                                     (d, e) => new
-                                     {
-                                         DepartmentName = d.Name,
-                                         EmployeeName = e.Name
-                                     });
+            var query2 = departments
+                .Join(
+                    inner: employees,
+                    outerKeySelector: d => d.ID,
+                    innerKeySelector: e => e.DepartmentID,
+                    resultSelector: (d, e) 
+                        => new
+                        {
+                            DepartmentName = d.Name,
+                            EmployeeName = e.Name
+                        });
 
             ShowAll(query2.Select(n => n.EmployeeName + " " + n.DepartmentName), "\nJoin 2 result\n");
 
             // Outer Join like operator
-            var query3 = departments.GroupJoin(employees,
-                                    d => d.ID,
-                                    e => e.DepartmentID,
-                                    (d, eg) => new
-                                    {
-                                        DepartmentName = d.Name,
-                                        EmployeeName = eg
-                                    });
+            var query3 = departments
+                .GroupJoin(
+                    inner: employees,
+                    outerKeySelector: d => d.ID, 
+                    innerKeySelector: e => e.DepartmentID,
+                    resultSelector: (d, eg) 
+                        => new
+                        {
+                            DepartmentName = d.Name,
+                            EmployeeName = eg
+                        });
 
             var query4 = from d in departments
                          join e in employees
@@ -259,7 +264,6 @@ namespace Recipes.Common.DotNetFramework
                              DepartmentName = d.Name,
                              Employees = eg
                          };
-
         }
 
 

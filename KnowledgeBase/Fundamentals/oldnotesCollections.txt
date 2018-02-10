@@ -1398,30 +1398,10 @@ integers in 32 bits of memory.
 ################################################################################
 ################################################################################
 
-
-UWAGA!!!
-
-1. sprawdz czy istnieje cos takiego jak tuple
-2. po przeroieniu kolekcji powtórz LINQ
-
-
-CIEKAWOSTKi:
-
-
-### All microsoft collections are reference type 
-
-### All value type have System.ValueType in inharitance hierarchy
-
-
-### According to OOP  collection with base type can store objects that have
-    derived type.
-### Equel operator in collection:   == operator compares references not the values: 
-
 int[] x1 = {1,2,3};  int[] x2 = {1,2,3}; int[] x3 = x1;
 
 x1==x2 // false 
 x1==x3 // true
-
 
 ### Loop 
 
