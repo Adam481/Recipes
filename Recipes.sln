@@ -9,21 +9,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamentals", "{24FBB17F-2055-4096-9BBA-2A5ABEBF5507}"
 	ProjectSection(SolutionItems) = preProject
-		oldnotesCollections.txt = oldnotesCollections.txt
-		oldNotesDelegates.txt = oldNotesDelegates.txt
-		oldNotesDocker.txt = oldNotesDocker.txt
-		oldnotesGenerics.txt = oldnotesGenerics.txt
-		oldNotesGit.txt = oldNotesGit.txt
-		oldnotesInterfaces.txt = oldnotesInterfaces.txt
-		oldNotesVagrant.txt = oldNotesVagrant.txt
-		oldNotexXPathsQuery.txt = oldNotexXPathsQuery.txt
+		KnowledgeBase\Fundamentals\oldnotesCollections.txt = KnowledgeBase\Fundamentals\oldnotesCollections.txt
+		KnowledgeBase\Fundamentals\oldNotesDelegates.txt = KnowledgeBase\Fundamentals\oldNotesDelegates.txt
+		KnowledgeBase\Fundamentals\oldNotesDocker.txt = KnowledgeBase\Fundamentals\oldNotesDocker.txt
+		KnowledgeBase\Fundamentals\oldnotesGenerics.txt = KnowledgeBase\Fundamentals\oldnotesGenerics.txt
+		KnowledgeBase\Fundamentals\oldNotesGit.txt = KnowledgeBase\Fundamentals\oldNotesGit.txt
+		KnowledgeBase\Fundamentals\oldnotesInterfaces.txt = KnowledgeBase\Fundamentals\oldnotesInterfaces.txt
+		KnowledgeBase\Fundamentals\oldNotesVagrant.txt = KnowledgeBase\Fundamentals\oldNotesVagrant.txt
+		KnowledgeBase\Fundamentals\oldNotexXPathsQuery.txt = KnowledgeBase\Fundamentals\oldNotexXPathsQuery.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Environment", "Environment", "{58E3CE8D-6A2D-4D10-850E-2FA98E8C674D}"
 	ProjectSection(SolutionItems) = preProject
-		PostBuildVSScripts.md = PostBuildVSScripts.md
-		TextFile1.txt = TextFile1.txt
-		VSCodeConfiguration.md = VSCodeConfiguration.md
+		KnowledgeBase\Environment\PostBuildVSScripts.md = KnowledgeBase\Environment\PostBuildVSScripts.md
+		KnowledgeBase\Environment\VSCodeConfiguration.md = KnowledgeBase\Environment\VSCodeConfiguration.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes", "src\Recipes\Recipes.csproj", "{92A1B735-18AA-4864-B641-B717505993EB}"
