@@ -6,29 +6,31 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipes.Common", "src\Recipes.Common\Recipes.Common.csproj", "{BE76D580-E30A-44CE-96B7-695EBB6F1501}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D8FF48A6-D68B-4EBC-913B-8A561DDEEEB9}"
-	ProjectSection(SolutionItems) = preProject
-		Scripts.txt = Scripts.txt
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamentals", "{24FBB17F-2055-4096-9BBA-2A5ABEBF5507}"
 	ProjectSection(SolutionItems) = preProject
 		oldnotesCollections.txt = oldnotesCollections.txt
 		oldNotesDelegates.txt = oldNotesDelegates.txt
+		oldNotesDocker.txt = oldNotesDocker.txt
 		oldnotesGenerics.txt = oldnotesGenerics.txt
+		oldNotesGit.txt = oldNotesGit.txt
 		oldnotesInterfaces.txt = oldnotesInterfaces.txt
+		oldNotesVagrant.txt = oldNotesVagrant.txt
 		oldNotexXPathsQuery.txt = oldNotexXPathsQuery.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Environment", "Environment", "{58E3CE8D-6A2D-4D10-850E-2FA98E8C674D}"
 	ProjectSection(SolutionItems) = preProject
-		oldNotesDocker.txt = oldNotesDocker.txt
-		oldNotesGit.txt = oldNotesGit.txt
-		oldNotesVagrant.txt = oldNotesVagrant.txt
+		PostBuildVSScripts.md = PostBuildVSScripts.md
+		TextFile1.txt = TextFile1.txt
+		VSCodeConfiguration.md = VSCodeConfiguration.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes", "src\Recipes\Recipes.csproj", "{92A1B735-18AA-4864-B641-B717505993EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.DesignPatterns", "src\Recipes.DesignPatterns\Recipes.DesignPatterns.csproj", "{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.DotNetCore", "src\Recipes.DotNetCore\Recipes.DotNetCore.csproj", "{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +50,10 @@ Global
 		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

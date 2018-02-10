@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 
@@ -7,74 +9,88 @@ namespace Recipes.JsonSamples
 {
     public class JsonNet
     {
-        private static readonly string fileFolder = @"sourcefile";
-
-        private static string FilePath(string fileName)
+        class Person
         {
-            return Path.Combine(fileFolder, fileName);
-        }
-
-        public static void Run()
-        {
-            //SimpleSerializeDeserialize();
-            //ObjectReferenceSerialization();
-            //WorkingWithExpandoObjects();
-            //DifferentType();
-            //JsonWriterTest();
-            //JsonReaderTest();
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Surname { get; set; }
         }
 
 
-        private static void SimpleSerializeDeserialize()
+        class Friend : Person
         {
-            string jsonData = @"{
-                                    'Id':'1',
-                                    'Name':'Adam',
-                                    'Surname':'Kowalski'
-                                }";
+            public List<Friend> Friends { get; set; } = new List<Friend>();
+
+            public Friend(Person person)
+            {
+                Id = person.Id;
+                Name = person.Name;
+                Surname = person.Surname;
+            }
+        }
+
+
+        class PersonRepository
+        {
+            public static PersonRepository Instance => new PersonRepository();
+
+            public IEnumerable<Person> GetAll()
+                => new List<Person>
+                {
+                    new Person { Id = 1, Name = "Adam", Surname = "Kowalski" },
+                    new Person { Id = 2, Name = "Paweł", Surname = "Maliszewski" },
+                    new Person { Id = 3, Name = "Stasiek", Surname = "Nowak" },
+                    new Person { Id = 4, Name = "Jakub", Surname = "Wisniewski" },
+                    new Person { Id = 5, Name = "Adam", Surname = "Malinowski" },
+                    new Person { Id = 6, Name = "Kamil", Surname = "Kraszewski" },
+                    new Person { Id = 7, Name = "Nikodem", Surname = "Poziomkowski" },
+                    new Person { Id = 8, Name = "Adrian", Surname = "Stefaniuk" },
+                    new Person { Id = 9, Name = "Karol", Surname = "Kodorski" }
+                };
+        }
+
+
+        public static void SimpleSerializeDeserialize()
+        {
+            string jsonData = 
+            @"{ 
+                ""Id"":""1"",
+                ""Name"":""Adam"",
+                ""Surname"":""Kowalski""
+            }";
 
             // Deserialization
             var person = JsonConvert.DeserializeObject<Person>(jsonData);
-
-            Console.WriteLine($"{person.Id} {person.Name} {person.Surname}" + "\n");
-
-
             // Serialization
-            string jsonDeserialized = string.Empty;
-
-            jsonDeserialized = JsonConvert.SerializeObject(person);
-            Console.WriteLine(jsonDeserialized + "\n");
-
-            jsonDeserialized = JsonConvert.SerializeObject(person, Formatting.Indented);
-            Console.WriteLine(jsonDeserialized + "\n");
+            string jsonMinified = JsonConvert.SerializeObject(person);
+            string jsonIndented = JsonConvert.SerializeObject(person, Formatting.Indented);
         }
 
 
-        private static void ObjectReferenceSerialization()
+        public static void ObjectReferenceSerialization()
         {
-            IEnumerable<Person> people = PersonRepository.GetAll();
+            IEnumerable<Person> people = PersonRepository.Instance.GetAll();
 
             Friend adam = new Friend(people.First(x => x.Name == "Adam"));
             Friend kamil = new Friend(people.First(x => x.Name == "Kamil"));
             Friend adrian = new Friend(people.First(x => x.Name == "Adrian"));
             Friend karol = new Friend(people.First(x => x.Name == "Karol"));
 
-            adam.FavoriteFriends.AddRange(new List<Friend> { kamil, adrian, adam });        // circular dependency
+            adam.Friends.AddRange(new List<Friend> { kamil, adrian, adam });        // circular dependency
 
-            // ERROR!!
-            // string adamJson = JsonConvert.SerializeObject(adam);     // Self referencing loop detected with type 'Learning.Notes.JsonNet+Friend'. Path 'FavoriteFriends'.
+            // ERROR!! Self referencing loop detected with type 'Learning.Notes.JsonNet+Friend'. Path 'Friends'.
+            // string adamJson = JsonConvert.SerializeObject(adam);
 
             string adamJson = JsonConvert.SerializeObject(adam, new JsonSerializerSettings
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 Formatting = Formatting.Indented
             });
-
-            Console.WriteLine(adamJson);
+            // OK
         }
 
 
-        private static void WorkingWithExpandoObjects()
+        public static void WorkingWithExpandoObjects()
         {
             dynamic personExpando = new ExpandoObject();
 
@@ -82,98 +98,73 @@ namespace Recipes.JsonSamples
             personExpando.Courses = new List<string> { "Solr", "dotTrace", "Jira" };
             personExpando.Happy = true;
 
-            string jsonDynamic = JsonConvert.SerializeObject(personExpando, Formatting.Indented);
-            Console.WriteLine(jsonDynamic);
-
-            dynamic personDeserialized = JsonConvert.DeserializeObject(jsonDynamic);
-            Console.WriteLine(personDeserialized.FriendlyName);
-
+            string json = JsonConvert.SerializeObject(personExpando, Formatting.Indented);
+            dynamic personDeserialized = JsonConvert.DeserializeObject(json);
         }
 
 
-        private static void DifferentType()
+        public static void DifferentType()
         {
-            string jsonData = @"
-                                {
-                                    'Id':'1',
-                                    'Name':'Adam',
-                                    'Surname':'Maliszewski'
-                                }
-                               ";
+            string jsonData =
+            @"{ 
+                ""Id"":""1"",
+                ""Name"":""Adam"",
+                ""Surname"":""Kowalski""
+            }";
 
             var person = JsonConvert.DeserializeObject(jsonData);   // annonymous type
-
-            Dictionary<string, string> personDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonData);
+            var personDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonData);
 
             foreach (KeyValuePair<string, string> item in personDictionary)
             {
                 Console.WriteLine($"(Key,Value) => {item.Key} : {item.Value}");
             }
-
-
-            //var anonymousPerson = new
-            //{
-            //    author = string.Empty,
-            //    happy = true,
-            //    courses = 0,
-            //    anotherproperty = string.Empty
-            //};
-
-            //var anotherAnonymous = JsonConvert.DeserializeAnonymousType(jsonData, anonymousPerson);
-
-            //Console.WriteLine(anotherAnonymous.author);
         }
 
 
         private static void JsonWriterTest()
         {
             // JsonTextReader  - large objects and files non-cached, forward only
-            // JsonTextWriteer - control andperformance non-cashed, forward only
+            // JsonTextWriteer - control and performance non-cashed, forward only
 
-            IEnumerable<Person> people = PersonRepository.GetAll();
+            IEnumerable<Person> people = PersonRepository.Instance.GetAll();
 
-            Friend adam = new Friend(people.First(x => x.Name == "Adam"));
-            Friend kamil = new Friend(people.First(x => x.Name == "Kamil"));
-            Friend adrian = new Friend(people.First(x => x.Name == "Adrian"));
+            var adam = new Friend(people.First(x => x.Name == "Adam"));
+            var kamil = new Friend(people.First(x => x.Name == "Kamil"));
+            var adrian = new Friend(people.First(x => x.Name == "Adrian"));
 
-            adam.FavoriteFriends.AddRange(new List<Friend> { kamil, adrian });
+            adam.Friends.AddRange(new List<Friend> { kamil, adrian });
 
-            JsonSerializer serializer;
+            var simpleSerializer = new JsonSerializer();
 
-            serializer = new JsonSerializer();
-
-            using (var sw = new StreamWriter(FilePath("first.json")))
+            using (var sw = new StreamWriter("someJsonFile.json"))
+            using (JsonWriter writter = new JsonTextWriter(sw))
             {
-                using (JsonWriter writter = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writter, adam);
-                }
+                simpleSerializer.Serialize(writter, adam);
             }
 
 
-            serializer = new JsonSerializer();
-            serializer.Formatting = Formatting.Indented;
-
-            using (var sw = new StreamWriter(FilePath("first-indented.json")))
+            var intendetSerializer = new JsonSerializer
             {
-                using (JsonWriter writter = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writter, adam);
-                }
+                Formatting = Formatting.Indented
+            };
+
+            using (var sw = new StreamWriter("someJsonFileIndented.json"))
+            using (JsonWriter writter = new JsonTextWriter(sw))
+            {
+                intendetSerializer.Serialize(writter, adam);
             }
 
-            serializer = new JsonSerializer();
-
-            serializer.Formatting = Formatting.Indented;
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-
-            using (var sw = new StreamWriter(FilePath("first-ignorenull.json")))
+            var noNullSerializer = new JsonSerializer
             {
-                using (JsonWriter writter = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writter, adam);
-                }
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
+            };
 
+            using (var sw = new StreamWriter("someJsonFileIgnoreNull.json"))
+            using (JsonWriter writter = new JsonTextWriter(sw))
+            {
+                noNullSerializer.Serialize(writter, adam);
             }
 
         }
@@ -181,17 +172,14 @@ namespace Recipes.JsonSamples
 
         private static void JsonReaderTest()
         {
-            // JsonNet uses reflection to read/write data. We can avoid it using JsonTextReader|Writer
+            string jsonData =
+            @"{ 
+                ""Id"":""1"",
+                ""Name"":""Adam"",
+                ""Surname"":""Kowalski""
+            }";
 
-            string jsonText = @"
-                                {
-                                    'Id':'1',
-                                    'Name':'Adam',
-                                    'Surname':'Maliszewski'
-                                }
-                               ";
-
-            JsonTextReader jsonReader = new JsonTextReader(new StringReader(jsonText));
+            JsonTextReader jsonReader = new JsonTextReader(new StringReader(jsonData));
             while (jsonReader.Read())
             {
                 if (jsonReader.Value != null)
@@ -204,31 +192,6 @@ namespace Recipes.JsonSamples
                 }
             }
 
-        }
-
-
-
-
-
-
-
-        public class Friend : Person
-        {
-            public List<Friend> FavoriteFriends { get; set; }
-
-
-            public Friend()
-            {
-                FavoriteFriends = new List<Friend>();
-            }
-
-            public Friend(Person person) : this()
-            {
-                Id = person.Id;
-                Name = person.Name;
-                Surname = person.Surname;
-            }
-
-        }
+        }        
     }
 }

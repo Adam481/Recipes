@@ -14,16 +14,19 @@ namespace Recipes.Common.DotNetFramework
         {
             object[] things = { "Glasses", 2, "Books" };
 
-            ArrayList listOfThings = new ArrayList(things);
+            var listOfThings = new ArrayList(things);
 
-            var query1 = listOfThings.OfType<int>();
+            var query1 = listOfThings
+                .OfType<int>();
 
-            var query2 = listOfThings.OfType<string>()
-                                     .Where(s => s.Length < 6);
+            var query2 = listOfThings
+                .OfType<string>()
+                .Where(s => s.Length < 6);
 
-            ShowAll<int>(query1, "\nWynik query 1");
-            ShowAll<string>(query2, "\nWynik query 2");
+            ShowAll(query1, "\nWynik query 1");
+            ShowAll(query2, "\nWynik query 2");
         }
+
 
         // OrderBy, OrderByDescending
         // ThenBy, ThenByDescending     (secondary sort)
@@ -32,8 +35,9 @@ namespace Recipes.Common.DotNetFramework
         {
             string[] names = { "Bob", "Alice", "Alex", "Carol" };
 
-            var query1a = names.OrderBy(s => s)
-                             .ThenBy(s => s.Length);
+            var query1a = names
+                .OrderBy(s => s)
+                .ThenBy(s => s.Length);
 
             var query1b = from name in names
                           orderby name, name.Length
@@ -41,23 +45,22 @@ namespace Recipes.Common.DotNetFramework
 
             // OrderBy return interface: IOrderedEnumerable<T>
             // ThenBy is an extension method for IOrderedEnumerable<T>
-            var query = Process.GetProcesses()
-                               .OrderBy(p => p.WorkingSet64)
-                               .ThenBy(p => p.Threads.Count);
+            var query = Process
+                .GetProcesses()
+                .OrderBy(p => p.WorkingSet64)
+                .ThenBy(p => p.Threads.Count);
+
             // .Where(p => p.ProcessName.Length < 10) - to return IEnumerable<T>
             // Be carefull: query is now IOrderedEnumerable<T>
             // query.Where(...) - will not going to be working
 
-            ShowAll<string>(query1a, "\nQuery 1a: standard ordering");
-            ShowAll<string>(query1b, "\nQuery 1b: standard ordering");
-            ShowAll<string>(query1a.Reverse(), "\nQuery 1a: revers ordering");
-            Console.WriteLine("\nTest process query");
-            foreach (var item in query)
-            {
-                Console.WriteLine(item.Id);
-            }
+            ShowAll(query1a, "\nQuery 1a: standard ordering");
+            ShowAll(query1b, "\nQuery 1b: standard ordering");
+            ShowAll(query1a.Reverse(), "\nQuery 1a: revers ordering");
+            ShowAll(query, "\nQuery: oreder by - then by");
 
         }
+
 
         // Distinct, Except, Intersect, Union
         public static void SetOperations()
@@ -65,36 +68,38 @@ namespace Recipes.Common.DotNetFramework
             int[] twos = { 2, 4, 6, 8, 10 };
             int[] threes = { 3, 6, 9, 12, 15 };
 
-            // 6                             - czesc wspolna
+            // 6
             var intersection = twos.Intersect(threes);
-            // 2, 4, 8, 10                   - co ma lewa czego nie ma prawa
+            // 2, 4, 8, 10
             var except = twos.Except(threes);
-            // 2, 4, 6, 8, 10, 3, 9, 12, 15  - wszystko bez duplikacji 
+            // 2, 4, 6, 8, 10, 3, 9, 12, 15
             var union = twos.Union(threes);
 
             var books = new List<Book>
             {
-                new Book { Author = "Scott", Name = "Programming WF" },
-                new Book { Author = "Fritz", Name = "Essentail ASP.NET" },
-                new Book { Author = "Scott", Name = "Programming WF" }
+                new Book { Author = "Adam", Name = "Programming WF" },
+                new Book { Author = "Zenon", Name = "Essentail ASP.NET" },
+                new Book { Author = "Adrian", Name = "Programming WF" }
             };
 
             var query = books.Distinct();       // we will get Scott twice because
-            ShowAll(query.Select(n => n.Name)); // becuase two reference refer to different object
+            ShowAll(query.Select(n => n.Name)); // two reference point to different object
             // We have tree solution:
-            // 1. overriding Equles method and hash code (very complicated way)
-            // 2. override Distinct (it is also to big deal)
+            // 1. overriding Equles method and hash code.
+            // 2. override Distinct.
             // 3. Project a book in a new anonymous type;
-            var query2 = books.Select(b => new { b.Name, b.Author })
-                              .Distinct();
+            var query2 = books
+                .Select(b => new { b.Name, b.Author })
+                .Distinct();
+
             ShowAll(query2.Select(n => n.Name), "\nCorrect distinct result:");
 
             // Operators that test quality use default IEqualityComparer
             // Anonymous types generated by C# compiler are special
             // Override Equals and GetHashCode
-            // Uses all public properties on type to test for quality
-
+            // They use all public properties on the type to test for quality
         }
+
 
         // All, Any, Contains
         public static void Quantifiers()
@@ -109,7 +114,7 @@ namespace Recipes.Common.DotNetFramework
             bool hasSeven = twos.Contains(7);
 
             // Evaluate base on several rules
-            Book book = new Book { Author = "Herman", Name = "Moby Dick" };
+            var book = new Book { Author = "Adam", Name = "Some name" };
 
             var bookValidationRules = new List<Func<Book, bool>>()
             {
@@ -120,31 +125,37 @@ namespace Recipes.Common.DotNetFramework
             bool isBookValid = bookValidationRules.All(rule => rule(book));
 
             Console.WriteLine("\nValidation result: {0}", isBookValid);
-
         }
+
 
         // Select, SelectMany
         public static void Projection()
         {
             string[] famousQuotes =
             {
-                "Advertising is legalized lying",
-                "Advertising is the greatest art form of the twentieth century"
+                "TEST 1",
+                "TEST 2"
             };
 
             var query = (from sentence in famousQuotes
                          from word in sentence.Split(' ')
                          select word).Distinct();
+
             ShowAll(query, "\nAll words:\n");
 
             // we will get sequence of two string arrays
-            var query2 = famousQuotes.Select(s => s.Split(' ')).Distinct();
+            var query2 = famousQuotes
+                .Select(s => s.Split(' '))
+                .Distinct();
 
             // SelectMany means sequence of sequence
-            var query3 = famousQuotes.SelectMany(s => s.Split(' ')).Distinct();
+            var query3 = famousQuotes
+                .SelectMany(s => s.Split(' '))
+                .Distinct();
 
             ShowAll(query3, "\nAll words (select many):\n");
         }
+
 
         // Skip, SkipWhile   
         // Take, TakeWhile
@@ -193,9 +204,9 @@ namespace Recipes.Common.DotNetFramework
 
             var employees = new List<Employee>
             {
-                new Employee { ID=1, Name="Scott", DepartmentID=1 },
-                new Employee { ID=2, Name="Poonam", DepartmentID=1 },
-                new Employee { ID=3, Name="Andy", DepartmentID=2 }
+                new Employee { ID=1, Name="Adam", DepartmentID=1 },
+                new Employee { ID=2, Name="Zenon", DepartmentID=1 },
+                new Employee { ID=3, Name="Kamil", DepartmentID=2 }
             };
 
             var departments = new List<Department>
@@ -214,6 +225,7 @@ namespace Recipes.Common.DotNetFramework
                             DepartmentName = d.Name,
                             EmployeeName = e.Name
                         };
+
             ShowAll(query.Select(n => n.EmployeeName + " " + n.DepartmentName), "\nJoin result\n");
 
             // Inner Join
@@ -225,6 +237,7 @@ namespace Recipes.Common.DotNetFramework
                                          DepartmentName = d.Name,
                                          EmployeeName = e.Name
                                      });
+
             ShowAll(query2.Select(n => n.EmployeeName + " " + n.DepartmentName), "\nJoin 2 result\n");
 
             // Outer Join like operator
@@ -248,6 +261,7 @@ namespace Recipes.Common.DotNetFramework
                          };
 
         }
+
 
         // GroupBy
         // ToLookup

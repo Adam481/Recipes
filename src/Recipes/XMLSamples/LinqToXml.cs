@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
+using System.Xml.Schema;
 
 namespace Recipes.Common.DotNetFramework
 {
@@ -26,21 +27,10 @@ namespace Recipes.Common.DotNetFramework
         XName
         XAttribute
         XComment
-
-
     */
-
 
     public class LinqToXML
     {
-        private static readonly string fileFolder = @"C:\Users\Adam Maliszewski\Desktop\C#_leraning\Learning\Learning\Notes\Files\";
-
-        private static string FilePath(string fileName)
-        {
-            return Path.Combine(fileFolder, fileName);
-        }
-
-
         public static void Run()
         {
             //CreatePeopleXML();
@@ -64,35 +54,35 @@ namespace Recipes.Common.DotNetFramework
 
             var xmlDocument = new XDocument();
             var xmlPeople = new XElement("People",
-
                 PersonRepository.GetAll()
-                    .Select(x => new XElement("Person",
-                                        new XAttribute("Id", x.Id),
-                                        new XElement("Name", x.Name),
-                                        new XElement("Surname", x.Surname)
-                                        ))
-            );
+                    .Select(x => 
+                        new XElement("Person",
+                            new XAttribute("Id", x.Id),
+                            new XElement("Name", x.Name),
+                            new XElement("Surname", x.Surname)
+                        )));
 
             xmlDocument.Add(xmlPeople);
-            xmlDocument.Save(FilePath("people.xml"));
+            xmlDocument.Save("people.xml");
         }
 
 
         public static void QueryPeopleXML()
         {
-            // if you have large xml file it is recommended to use old XMLReader caouse it is able to stream through all file. 
+            // if you have large xml file it is recommended to use old XMLReader 
+            // caouse it is able to stream through all file. 
             // XMLDocument just loads the entire file into the memory
 
-            var document = XDocument.Load(FilePath("people.xml"));
+            var document = XDocument.Load("people.xml");
 
             // get the first element with particular name | get a collection of child element | or directly get all Person element document.Descendants("Person")
 
-            var s = document.Element("People")
-                            .Elements()
-                            .Where(x => (int)x.Attribute("Id") > 5)
-                            .Select(
-                                x => x.Attribute("Id").Value + " " + string.Concat(x.Elements()
-                                                                                    .Select(e => e.Value + " ")));
+            var s = document
+                .Element("People")
+                .Elements()
+                .Where(x => (int)x.Attribute("Id") > 5)
+                .Select(x => 
+                    x.Attribute("Id").Value + " " + string.Concat(x.Elements().Select(e => e.Value + " ")));
 
             s.ToList().ForEach(x => Console.WriteLine(x));
         }
@@ -122,19 +112,20 @@ namespace Recipes.Common.DotNetFramework
                         new XElement("TotalMarks", "950"))
                         ));
 
-            xmlDocument.Save(FilePath("students.xml"));
+            xmlDocument.Save("students.xml");
 
         }
 
 
         public static void QueryStudentXML()
         {
-            IEnumerable<string> names = XDocument.Load(FilePath("students.xml"))
-                                                 .Descendants("Student")
-                                                 .Where(x => (int)x.Element("TotalMarks") > 800)
-                                                 .OrderByDescending(x => (int)x.Element("TotalMarks"))
-                                                 .ThenBy(x => x.Element("Name"))
-                                                 .Select(x => x.Element("Name").Value);
+            IEnumerable<string> names = XDocument
+                .Load("students.xml")
+                .Descendants("Student")
+                .Where(x => (int)x.Element("TotalMarks") > 800)
+                .OrderByDescending(x => (int)x.Element("TotalMarks"))
+                .ThenBy(x => x.Element("Name"))
+                .Select(x => x.Element("Name").Value);
 
             names.ToList().ForEach(x => Console.WriteLine(x));
         }
@@ -142,21 +133,21 @@ namespace Recipes.Common.DotNetFramework
 
         private static void AddStudentElementAtTheBegining()
         {
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
             xmlDocument.Root.AddFirst(
-                    new XElement("Student", new XAttribute("Id", 99),
-                        new XElement("Name", "John"),
-                        new XElement("Gender", "Male"),
-                        new XElement("TotalMarks", "940")));
+                new XElement("Student", new XAttribute("Id", 99),
+                    new XElement("Name", "John"),
+                    new XElement("Gender", "Male"),
+                    new XElement("TotalMarks", "940")));
 
-            xmlDocument.Save(FilePath("students.xml"));
-
+            xmlDocument.Save("students.xml");
         }
+
 
         private static void AddStudentElementAtTheEnd()
         {
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
             xmlDocument.Root.Add(
                     new XElement("Student", new XAttribute("Id", 105),
@@ -171,40 +162,39 @@ namespace Recipes.Common.DotNetFramework
         private static void AddStudentElementInSpecificLocation()
         {
             // AddAfterSelf | AddBeforeSelf
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
             xmlDocument.Element("Students")
-                       .Elements()
-                       .Where(x => (int)x.Attribute("Id") == 1).FirstOrDefault()
-                       .AddAfterSelf(
-                          new XElement("Student", new XAttribute("Id", 105),
-                              new XElement("Name", "Alan"),
-                              new XElement("Gender", "Male"),
-                              new XElement("TotalMarks", "840"))
-                       );
+                .Elements()
+                .Where(x => (int)x.Attribute("Id") == 1).FirstOrDefault()
+                .AddAfterSelf(
+                    new XElement("Student", new XAttribute("Id", 105),
+                        new XElement("Name", "Alan"),
+                        new XElement("Gender", "Male"),
+                        new XElement("TotalMarks", "840")));
 
-            xmlDocument.Save(FilePath("students.xml"));  // , SaveOptions.DisableFormatting    - if you want to get rid of new line (ex. if you send file to remoute host)
+            xmlDocument.Save("students.xml");  // , SaveOptions.DisableFormatting - if you want to get rid of new line
         }
 
 
         private static void ModifyStudentElement()
         {
             // SetElementValue | SetAttributeValue
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
             xmlDocument.Element("Students")
-                       .Elements()
-                       .Where(x => (int)x.Attribute("Id") == 105).FirstOrDefault()
-                       .SetElementValue("TotalMarks", 999);
+                .Elements()
+                .Where(x => (int)x.Attribute("Id") == 105).FirstOrDefault()
+                .SetElementValue("TotalMarks", 999);
 
-            xmlDocument.Save(FilePath("students.xml"));
+            xmlDocument.Save("students.xml");
 
             //OR
             /* 
             xmlDocument.Element("Students")
-                       .Elements()
-                       .Where(x => (int)x.Attribute("Id") == 105)
-                       .Select(x => x.Element("TotalMarks")).FirstOrDefault().SetValue(999);
+                .Elements()
+                .Where(x => (int)x.Attribute("Id") == 105)
+                .Select(x => x.Element("TotalMarks")).FirstOrDefault().SetValue(999);
             */
 
             //changing comment value
@@ -217,14 +207,15 @@ namespace Recipes.Common.DotNetFramework
 
         private static void RemoveStudentElement()
         {
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
-            xmlDocument.Root.Elements().Where(x => x.Attribute("Id").Value == "99").Remove();
+            xmlDocument.Root.Elements()
+                .Where(x => x.Attribute("Id").Value == "99")
+                .Remove();
 
-            xmlDocument.Save(FilePath("students.xml"));
+            xmlDocument.Save("students.xml");
 
-
-            // Deleting all elements that are present under root node
+            // Deleting all elements that are exist under root node
             //xmlDocument.Root.Elements().Remove();
 
             // Deleting all comments from the xml document
@@ -237,22 +228,28 @@ namespace Recipes.Common.DotNetFramework
             var sb = new StringBuilder();
             string delimiter = ",";
 
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
-            xmlDocument.Descendants("Student").ToList().ForEach(
-                element => sb.Append(element.Attribute("Id").Value + delimiter +
-                                     string.Concat(element.Elements().Select(x => x.Value + delimiter)) +
-                                     Environment.NewLine));
+            xmlDocument.Descendants("Student")
+                .ToList()
+                .ForEach(
+                    element => 
+                        sb.Append(
+                            element.Attribute("Id").Value + 
+                            delimiter +
+                            string.Concat(element.Elements().Select(x => x.Value + delimiter)) +
+                            Environment.NewLine));
 
-            var sw = new StreamWriter(FilePath("studentsCSV.csv"));
-            sw.WriteLine(sb.ToString());
-            sw.Close();
+            using (var sw = new StreamWriter("studentsCSV.csv"))
+            {
+                sw.WriteLine(sb.ToString());
+            }
         }
 
 
         private static void TransformStudentToHtmlTable()
         {
-            var xmlDocument = XDocument.Load(FilePath("students.xml"));
+            var xmlDocument = XDocument.Load("students.xml");
 
             XDocument result = new XDocument(
                 new XElement("table", new XAttribute("border", 1),
@@ -267,10 +264,9 @@ namespace Recipes.Common.DotNetFramework
                                 .Select(x => new XElement("tr",
                                     x.Elements()
                                      .Select(e => new XElement("td", e.Value)))
-                            ))
-                 )));
+                            )))));
 
-            result.Save(FilePath("studentsHTML.html"));
+            result.Save("studentsHTML.html");
         }
 
 
@@ -302,10 +298,9 @@ namespace Recipes.Common.DotNetFramework
             */
 
             var xmlSchema = new XmlSchemaSet();
+            xmlSchema.Add("", "Student.xsd");
 
-            xmlSchema.Add("", FilePath("Student.xsd"));
-
-            var doc = XDocument.Load(FilePath("students.xml"));
+            var doc = XDocument.Load("students.xml");
 
             bool valdationErrors = false;
 
@@ -315,21 +310,10 @@ namespace Recipes.Common.DotNetFramework
                 valdationErrors = true;
             });
 
-            if (valdationErrors)
-            {
-                Console.WriteLine("validation failed");
-            }
-            else
-            {
-                Console.WriteLine("validation succedded");
-            }
-
-
-
         }
     }
 
-    public class PersonRepository
+    class PersonRepository
     {
         public static List<Person> GetAll()
         {
