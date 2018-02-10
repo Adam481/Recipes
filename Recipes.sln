@@ -7,18 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipes.Common", "src\Recip
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D8FF48A6-D68B-4EBC-913B-8A561DDEEEB9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamentals", "{24FBB17F-2055-4096-9BBA-2A5ABEBF5507}"
-	ProjectSection(SolutionItems) = preProject
-		KnowledgeBase\Fundamentals\oldnotesCollections.txt = KnowledgeBase\Fundamentals\oldnotesCollections.txt
-		KnowledgeBase\Fundamentals\oldNotesDelegates.txt = KnowledgeBase\Fundamentals\oldNotesDelegates.txt
-		KnowledgeBase\Fundamentals\oldNotesDocker.txt = KnowledgeBase\Fundamentals\oldNotesDocker.txt
-		KnowledgeBase\Fundamentals\oldnotesGenerics.txt = KnowledgeBase\Fundamentals\oldnotesGenerics.txt
-		KnowledgeBase\Fundamentals\oldNotesGit.txt = KnowledgeBase\Fundamentals\oldNotesGit.txt
-		KnowledgeBase\Fundamentals\oldnotesInterfaces.txt = KnowledgeBase\Fundamentals\oldnotesInterfaces.txt
-		KnowledgeBase\Fundamentals\oldNotesVagrant.txt = KnowledgeBase\Fundamentals\oldNotesVagrant.txt
-		KnowledgeBase\Fundamentals\oldNotexXPathsQuery.txt = KnowledgeBase\Fundamentals\oldNotexXPathsQuery.txt
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Environment", "Environment", "{58E3CE8D-6A2D-4D10-850E-2FA98E8C674D}"
 	ProjectSection(SolutionItems) = preProject
 		KnowledgeBase\Environment\PostBuildVSScripts.md = KnowledgeBase\Environment\PostBuildVSScripts.md
@@ -29,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes", "src\Recipes\Reci
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.DesignPatterns", "src\Recipes.DesignPatterns\Recipes.DesignPatterns.csproj", "{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.DotNetCore", "src\Recipes.DotNetCore\Recipes.DotNetCore.csproj", "{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipes.DotNetCore", "src\Recipes.DotNetCore\Recipes.DotNetCore.csproj", "{FC01D081-D05C-4C1E-84CB-1A28B47C07D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,7 +46,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{24FBB17F-2055-4096-9BBA-2A5ABEBF5507} = {D8FF48A6-D68B-4EBC-913B-8A561DDEEEB9}
 		{58E3CE8D-6A2D-4D10-850E-2FA98E8C674D} = {D8FF48A6-D68B-4EBC-913B-8A561DDEEEB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
