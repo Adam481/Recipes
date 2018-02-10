@@ -2,13 +2,13 @@
 using System.Configuration;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Recipes.Common.DotNetFramework.Tests")]
+[assembly: InternalsVisibleTo("Recipes.Tests")]
 
-namespace Recipes.Common.DotNetFramework
+namespace Recipes
 {
     // TODO: add description
     // It does not work in .net core
-    internal class MySection : ConfigurationSection
+    public class MySection : ConfigurationSection
     {
         private MySection() { }
 
@@ -22,7 +22,7 @@ namespace Recipes.Common.DotNetFramework
     }
 
 
-    internal class Items : ConfigurationElementCollection
+    public class Items : ConfigurationElementCollection
     {
         public ItemConfiguration this[int index]
         {
@@ -60,7 +60,7 @@ namespace Recipes.Common.DotNetFramework
     }
 
 
-    internal class ItemConfiguration : ConfigurationElement
+    public class ItemConfiguration : ConfigurationElement
     {
         [ConfigurationProperty("name", IsRequired = true)]
         public string Name => this["name"].ToString();
@@ -73,7 +73,7 @@ namespace Recipes.Common.DotNetFramework
     }
 
 
-    internal class Subitem : ConfigurationElement
+    public class Subitem : ConfigurationElement
     {
 
         [ConfigurationProperty("firstproperty", IsRequired = true)]
@@ -85,7 +85,7 @@ namespace Recipes.Common.DotNetFramework
     }
 
 
-    internal class OtherSubitem : ConfigurationElement
+    public class OtherSubitem : ConfigurationElement
     {
         [ConfigurationProperty("firstproperty", IsRequired = true)]
         public int FirstProeprty => Int32.Parse(this["firstpropertys"].ToString());

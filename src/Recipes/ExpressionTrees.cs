@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Recipes.Common
+namespace Recipes
 {
-    public class ExpressionTrees
+    public static class ExpressionTrees
     {
         public static void SimpleExpressionTreeExample()
         {

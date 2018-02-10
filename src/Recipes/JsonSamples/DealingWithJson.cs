@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Recipes.Common.DotNetFramework
+namespace Recipes.JsonSamples
 {
     public class JsonNet
     {
-        private static readonly string fileFolder = @"C:\Users\Adam Maliszewski\Desktop\C#_leraning\Learning\Learning\Notes\Files\";
+        private static readonly string fileFolder = @"sourcefile";
 
         private static string FilePath(string fileName)
         {
@@ -27,16 +27,14 @@ namespace Recipes.Common.DotNetFramework
 
         private static void SimpleSerializeDeserialize()
         {
-            string jsonData = @"
-                                {
+            string jsonData = @"{
                                     'Id':'1',
                                     'Name':'Adam',
-                                    'Surname':'Maliszewski'
-                                }
-                               ";
+                                    'Surname':'Kowalski'
+                                }";
 
             // Deserialization
-            Person person = JsonConvert.DeserializeObject<Person>(jsonData);
+            var person = JsonConvert.DeserializeObject<Person>(jsonData);
 
             Console.WriteLine($"{person.Id} {person.Name} {person.Surname}" + "\n");
 

@@ -10,14 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Scripts.txt = Scripts.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipes.Tests", "src\Recipes.Tests\Recipes.Tests.csproj", "{2BA03403-22A8-4844-AB7F-77B3A5E687DB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Common.DotNetFramework", "src\Recipes.Common.DotNetFramework\Recipes.Common.DotNetFramework.csproj", "{4B533A73-1F05-4E84-9132-E80F52E7D9E2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Common.DotNetFramework.Tests", "src\Recipes.Common.DotNetFramework.Tests\Recipes.Common.DotNetFramework.Tests.csproj", "{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.Algorithms", "src\Recipes.Algorithms\Recipes.Algorithms.csproj", "{59D2E606-95C7-46BE-B7B6-80529723F0D5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamentals", "{24FBB17F-2055-4096-9BBA-2A5ABEBF5507}"
 	ProjectSection(SolutionItems) = preProject
 		oldnotesCollections.txt = oldnotesCollections.txt
@@ -27,14 +19,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamental
 		oldNotexXPathsQuery.txt = oldNotexXPathsQuery.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.DesignPatterns", "src\Recipes.DesignPatterns\Recipes.DesignPatterns.csproj", "{059526D5-E814-4B12-B4CB-9EA78E93EEE8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Environment", "Environment", "{58E3CE8D-6A2D-4D10-850E-2FA98E8C674D}"
 	ProjectSection(SolutionItems) = preProject
 		oldNotesDocker.txt = oldNotesDocker.txt
 		oldNotesGit.txt = oldNotesGit.txt
 		oldNotesVagrant.txt = oldNotesVagrant.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes", "src\Recipes\Recipes.csproj", "{92A1B735-18AA-4864-B641-B717505993EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes.DesignPatterns", "src\Recipes.DesignPatterns\Recipes.DesignPatterns.csproj", "{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,26 +40,14 @@ Global
 		{BE76D580-E30A-44CE-96B7-695EBB6F1501}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE76D580-E30A-44CE-96B7-695EBB6F1501}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE76D580-E30A-44CE-96B7-695EBB6F1501}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2BA03403-22A8-4844-AB7F-77B3A5E687DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2BA03403-22A8-4844-AB7F-77B3A5E687DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2BA03403-22A8-4844-AB7F-77B3A5E687DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2BA03403-22A8-4844-AB7F-77B3A5E687DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B533A73-1F05-4E84-9132-E80F52E7D9E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B533A73-1F05-4E84-9132-E80F52E7D9E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B533A73-1F05-4E84-9132-E80F52E7D9E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B533A73-1F05-4E84-9132-E80F52E7D9E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50BD6B72-A9C1-4311-A275-85E0C1D4F5B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59D2E606-95C7-46BE-B7B6-80529723F0D5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{059526D5-E814-4B12-B4CB-9EA78E93EEE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{059526D5-E814-4B12-B4CB-9EA78E93EEE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{059526D5-E814-4B12-B4CB-9EA78E93EEE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{059526D5-E814-4B12-B4CB-9EA78E93EEE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92A1B735-18AA-4864-B641-B717505993EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92A1B735-18AA-4864-B641-B717505993EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92A1B735-18AA-4864-B641-B717505993EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92A1B735-18AA-4864-B641-B717505993EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB8511D2-70FB-41F9-8E84-5CFAF4130B50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
